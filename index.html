@@ -1,0 +1,908 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Nûr Retreats — Business Model & Cash-Flow v1.1</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--terra:#B4552F;--terra-d:#8F3F21;--sand:#EFE6D6;--sand-2:#F7F2EA;--sand-3:#E3D6C0;--ink:#2B2622;--ink-2:#5C534B;--ink-3:#8C8178;--line:#DDD2C0;--surface:#FCFBF8;--vip:#2a78d6;--cost:#4a3aa7;--ok:#1b7f4e;--warn:#B8860B;--bad:#B3261E;}
+*{box-sizing:border-box}
+body{margin:0;background:var(--sand-2);color:var(--ink);font-family:Inter,system-ui,sans-serif;font-size:13.5px;line-height:1.45}
+h1,h2,h3,.serif{font-family:"Cormorant Garamond",Georgia,serif}
+.topbar{background:var(--ink);color:#F3EBDD;display:flex;align-items:center;gap:18px;padding:12px 26px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:12px}
+.sun{width:34px;height:34px;border-radius:50%;background:radial-gradient(circle,#F2C98B 0 35%,transparent 36%),conic-gradient(from 0deg,#D9924F 0 8deg,transparent 8deg 45deg,#D9924F 45deg 53deg,transparent 53deg 90deg,#D9924F 90deg 98deg,transparent 98deg 135deg,#D9924F 135deg 143deg,transparent 143deg 180deg,#D9924F 180deg 188deg,transparent 188deg 225deg,#D9924F 225deg 233deg,transparent 233deg 270deg,#D9924F 270deg 278deg,transparent 278deg 315deg,#D9924F 315deg 323deg,transparent 323deg 360deg)}
+.brand h1{margin:0;font-size:24px;font-weight:600;letter-spacing:.5px}
+.brand small{display:block;font-family:Inter;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:#C9B99C}
+.spacer{flex:1}
+.pill{border:1px solid #6B5E52;border-radius:20px;padding:5px 12px;font-size:12px;color:#E8DCC8;background:transparent;cursor:pointer}
+.pill.active,.pill:hover{background:var(--terra);border-color:var(--terra);color:#fff}
+.mock{background:var(--warn);color:#fff;font-size:11px;letter-spacing:1.5px;padding:4px 10px;border-radius:4px;font-weight:600}
+nav{background:#fff;border-bottom:1px solid var(--line);padding:0 26px;display:flex;gap:2px;overflow-x:auto}
+nav button{background:none;border:none;border-bottom:3px solid transparent;padding:14px 16px;font:500 13px Inter;color:var(--ink-2);cursor:pointer;white-space:nowrap}
+nav button.active{color:var(--terra);border-color:var(--terra)}
+main{padding:22px 26px 60px;max-width:1440px;margin:0 auto}
+section.tab{display:none}section.tab.active{display:block}
+.row{display:grid;gap:16px}
+.g4{grid-template-columns:repeat(4,1fr)}.g3{grid-template-columns:repeat(3,1fr)}.g2{grid-template-columns:repeat(2,1fr)}.g32{grid-template-columns:3fr 2fr}
+@media(max-width:1000px){.g4{grid-template-columns:repeat(2,1fr)}.g3,.g2,.g32{grid-template-columns:1fr}}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px 18px}
+.card h3{margin:0 0 4px;font-size:19px;font-weight:600}
+.card .sub{color:var(--ink-3);font-size:12px;margin-bottom:10px}
+.kpi .lbl{font-size:11px;letter-spacing:1.2px;text-transform:uppercase;color:var(--ink-3)}
+.kpi .val{font-family:"Cormorant Garamond",serif;font-size:32px;font-weight:600;line-height:1.1;margin:4px 0 2px}
+.kpi .delta{font-size:12px;color:var(--ink-2)}
+.kpi.accent{border-top:3px solid var(--terra)}.kpi.vipc{border-top:3px solid var(--vip)}.kpi.costc{border-top:3px solid var(--cost)}.kpi.cash{border-top:3px solid var(--ink)}
+.scen{display:flex;gap:8px;align-items:center;margin-bottom:16px;flex-wrap:wrap}
+.scen .chip{border:1px solid var(--line);background:#fff;border-radius:20px;padding:6px 14px;font-size:12px;cursor:pointer}
+.scen .chip.active{background:var(--ink);color:#fff;border-color:var(--ink)}
+.scen .note{color:var(--ink-3);font-size:12px;margin-left:6px}
+table{width:100%;border-collapse:collapse;font-size:12.5px}
+th{font-weight:600;text-align:left;color:var(--ink-2);border-bottom:1px solid var(--line);padding:7px 8px;font-size:11.5px;text-transform:uppercase;letter-spacing:.6px;background:var(--sand-2);position:sticky;top:0}
+td{padding:6px 8px;border-bottom:1px solid #EEE6D8;white-space:nowrap}
+td.n,th.n{text-align:right;font-variant-numeric:tabular-nums}
+tr.total td{font-weight:600;border-top:2px solid var(--ink);background:var(--sand-2)}
+tr.sec td{font-family:"Cormorant Garamond",serif;font-size:16px;font-weight:600;color:var(--terra);padding-top:14px;border-bottom:none}
+tr.sec.vipsec td{color:var(--vip)} tr.sec.costsec td{color:var(--cost)}
+.inp{display:inline-block;min-width:92px;text-align:right;border:1px solid var(--line);background:#fff;border-radius:6px;padding:4px 8px;font-variant-numeric:tabular-nums;color:var(--ink)}
+.inp.ro{background:var(--sand-2);color:var(--ink-3);border-style:dashed}
+.unit{color:var(--ink-3);font-size:11px;margin-left:5px}
+.legend{display:flex;gap:16px;font-size:12px;color:var(--ink-2);margin:6px 0 4px;flex-wrap:wrap}
+.legend span::before{content:"";display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:6px;vertical-align:-1px;background:var(--c)}
+.tblwrap{overflow:auto;max-height:560px;border:1px solid var(--line);border-radius:8px}
+#cashTable table{font-size:11.5px}#cashTable td,#cashTable th{padding:5px 6px}
+.neg{color:var(--bad)} .pos{color:var(--ok)}
+.tag{font-size:10.5px;padding:2px 7px;border-radius:4px;background:var(--sand);color:var(--ink-2);margin-left:6px}
+.tag.r{background:#F3DED4;color:var(--terra-d)} .tag.v{background:#DCE9F9;color:#1B4F8C}
+.toolbar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+.btn{border:1px solid var(--line);background:#fff;border-radius:8px;padding:8px 14px;font:500 12.5px Inter;cursor:pointer;color:var(--ink)}
+.btn.primary{background:var(--terra);color:#fff;border-color:var(--terra)}
+.callout{background:#FBF3EC;border-left:3px solid var(--terra);padding:10px 14px;border-radius:6px;font-size:12.5px;margin:10px 0}
+.callout.blue{background:#EAF2FC;border-color:var(--vip)}
+svg text{font-family:Inter,sans-serif;fill:var(--ink-2)}
+.cal{display:grid;grid-template-columns:repeat(52,1fr);gap:2px;margin-top:8px}
+.cal div{height:26px;border-radius:3px;background:var(--sand-3);position:relative}
+.cal div.r{background:var(--terra)}.cal div.v{background:var(--vip)}.cal div.rv{background:linear-gradient(135deg,var(--terra) 50%,var(--vip) 50%)}
+.cal div:hover::after{content:attr(data-t);position:absolute;top:30px;left:0;background:var(--ink);color:#fff;font-size:11px;padding:4px 8px;border-radius:4px;white-space:nowrap;z-index:5}
+.sens{display:grid;grid-template-columns:auto repeat(5,1fr);gap:3px;font-size:12px}
+.sens div{padding:8px 6px;text-align:center;border-radius:4px;background:#fff;border:1px solid var(--line)}
+.sens .h{background:var(--sand-2);font-weight:600;color:var(--ink-2)}
+footer{color:var(--ink-3);font-size:11.5px;text-align:center;padding:20px}
+.kpi.btn-tile{cursor:pointer;transition:box-shadow .15s,transform .15s;position:relative}
+.kpi.btn-tile:hover{box-shadow:0 4px 14px rgba(43,38,34,.10);transform:translateY(-1px)}
+.kpi.btn-tile.active{background:var(--ink);color:#F3EBDD;border-color:var(--ink)}
+.kpi.btn-tile.active .lbl,.kpi.btn-tile.active .delta{color:#C9B99C}
+.kpi.btn-tile .hint{position:absolute;right:14px;top:12px;font-size:10.5px;color:var(--ink-3);letter-spacing:.5px}
+.kpi.btn-tile.active .hint{color:#C9B99C}
+.panel{background:var(--surface);border:1px solid var(--line);border-left:4px solid var(--terra);border-radius:10px;padding:16px 18px;margin-top:16px}
+.panel.blue{border-left-color:var(--vip)} .panel.violet{border-left-color:var(--cost)}
+.panel h4{font-family:"Cormorant Garamond",serif;font-size:19px;margin:0 0 4px}
+.panel .pgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+@media(max-width:1000px){.panel .pgrid{grid-template-columns:1fr}}
+.panel .close{float:right;border:none;background:none;color:var(--ink-3);cursor:pointer;font-size:16px}
+.fbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:14px 0 10px}
+.fbar .chip{border:1px solid var(--line);background:#fff;border-radius:20px;padding:5px 12px;font-size:12px;cursor:pointer}
+.fbar .chip.active{background:var(--ink);color:#fff;border-color:var(--ink)}
+.fbar .chip.r.active{background:var(--terra);border-color:var(--terra)} .fbar .chip.v.active{background:var(--vip);border-color:var(--vip)}
+.fbar .sep{width:1px;height:20px;background:var(--line);margin:0 4px}
+.fbar input{border:1px solid var(--line);border-radius:8px;padding:5px 10px;font:12px Inter;min-width:170px}
+.fbar select{border:1px solid var(--line);border-radius:8px;padding:5px 8px;font:12px Inter;background:#fff}
+.fbar .lab{font-size:11.5px;color:var(--ink-3);text-transform:uppercase;letter-spacing:.8px}
+.xp{display:inline-block;width:18px;height:18px;line-height:16px;text-align:center;border:1px solid var(--line);border-radius:4px;background:#fff;font-size:13px;margin-right:8px;cursor:pointer;color:var(--ink-2);vertical-align:-2px}
+.xp.open{background:var(--ink);color:#fff;border-color:var(--ink)}
+tr.l1 td:first-child{cursor:pointer}
+tr.l2 td{background:#FBF8F2;color:var(--ink-2);font-size:12px}
+tr.l2 td:first-child{padding-left:40px}
+tr.l2 td .drv{color:var(--ink-3);font-size:11px;margin-left:8px}
+tr.l3 td{background:#F6F1E8;color:var(--ink-3);font-size:11.5px}
+tr.l3 td:first-child{padding-left:66px}
+.mini{display:flex;align-items:flex-end;gap:3px;height:70px;margin-top:8px}
+.mini div{flex:1;background:var(--cost);border-radius:2px 2px 0 0;position:relative}
+.mini div.r{background:var(--terra)} .mini div.v{background:var(--vip)}
+.mini div span{position:absolute;bottom:-16px;left:0;right:0;text-align:center;font-size:9.5px;color:var(--ink-3)}
+.chips{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+.chips .c{background:#fff;border:1px solid var(--line);border-radius:8px;padding:8px 12px;font-size:12px;color:var(--ink-2)}
+.chips .c b{color:var(--ink);font-variant-numeric:tabular-nums}
+.chips .c.warn{border-color:#E7C98A;background:#FDF6E7}
+.tbl-hdr-actions{display:flex;gap:8px;justify-content:flex-end;margin-bottom:6px}
+.tbl-hdr-actions button{border:1px solid var(--line);background:#fff;border-radius:6px;padding:4px 10px;font:12px Inter;cursor:pointer}
+.small-tbl td,.small-tbl th{padding:5px 6px;font-size:12px}
+.panel th{position:static}
+.hyp input[type=number],.hyp input[type=text],.hyp input[type=date]{width:110px;text-align:right;border:1px solid var(--line);border-radius:6px;padding:4px 8px;font:12.5px Inter;background:#fff;color:var(--ink)}
+.hyp input.g{width:38px;padding:3px 4px;text-align:center}
+.hyp input.w{width:150px;text-align:left}
+.hyp .key{display:block;font-size:10px;color:var(--ink-3);font-family:ui-monospace,Menlo,monospace}
+.hyp table td{white-space:normal}
+.hyp .sw{display:inline-flex;gap:6px;align-items:center}
+.hyp .sw input{width:auto}
+.hyp .derived{color:var(--ink-3);font-size:12px}
+.check{padding:8px 12px;border-radius:6px;margin:6px 0;font-size:12.5px;border:1px solid var(--line);background:#fff}
+.check.bad{background:#FBE9E7;border-color:#E9B4AE;color:#8B1F17}
+.check.ok{background:#EAF4EC;border-color:#BFDCC6;color:#1b5e33}
+.scen .chip.custom{border-style:dashed}
+.scen .chip.dirty::after{content:" •";color:var(--terra)}
+.mock.live{background:#1b7f4e}.mock.stale{background:var(--terra)}
+@media print{.topbar,nav,.toolbar,.scen,.fbar,.tbl-hdr-actions,#checks{display:none}section.tab{display:block!important;page-break-after:always}.tblwrap{max-height:none;overflow:visible}body{background:#fff}main{max-width:none;padding:0 6mm}.card,.panel{break-inside:avoid}}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <div class="brand"><div class="sun"></div><div><h1>Nûr Retreats</h1><small data-i18n="subtitle">Business model &amp; prévisions de trésorerie</small></div></div>
+  <span class="mock" id="modeBadge" data-i18n="mode.local">v1.1 · MODE LOCAL</span>
+  <div class="spacer"></div>
+  <button class="pill active" id="langFR" onclick="setLang('fr')">FR</button>
+  <button class="pill" id="langEN" onclick="setLang('en')">EN</button>
+  <button class="pill" onclick="window.print()">⎙ <span data-i18n="print">Imprimer / PDF</span></button>
+  <button class="pill" id="btnExportJson">⇩ JSON</button>
+  <button class="pill" id="btnExportCsvHyp">⇩ <span data-i18n="xlsx">Hypothèses → Sheet (CSV)</span></button>
+  <button class="pill" id="btnExportLedger">⇩ <span data-i18n="ledgerCsv">Trésorerie (CSV)</span></button>
+  <input type="file" id="fileImport" accept=".json,.csv" style="display:none">
+</div>
+<nav id="nav">
+  <button data-tab="dash" class="active" data-i18n="t.dash">Tableau de bord</button>
+  <button data-tab="hyp" data-i18n="t.hyp">Hypothèses</button>
+  <button data-tab="rev" data-i18n="t.rev">Revenus</button>
+  <button data-tab="cost" data-i18n="t.cost">Charges</button>
+  <button data-tab="cash" data-i18n="t.cash">Trésorerie hebdomadaire</button>
+  <button data-tab="viz" data-i18n="t.viz">Visualisations</button>
+</nav>
+<main>
+  <div class="scen">
+    <span style="font-size:12px;color:var(--ink-2)" data-i18n="scenario">Scénario :</span>
+    <button class="chip active" data-scen="base" data-i18n="s.base">Base (hypothèses KEF)</button>
+    <button class="chip" data-scen="ramp" data-i18n="s.ramp">Montée en charge</button>
+    <button class="chip" data-scen="stress" data-i18n="s.stress">Stress</button>
+    <button class="chip" data-scen="playbook" data-i18n="s.playbook">Playbook Y1</button>
+    <span id="customScen"></span>
+    <button class="chip" id="btnSaveScen" title="Enregistrer les hypothèses courantes comme scénario">＋ <span data-i18n="s.save">Enregistrer</span></button>
+    <span class="note" id="scenNote"></span>
+  </div>
+
+  <!-- DASHBOARD -->
+  <section class="tab active" id="tab-dash">
+    <div class="row g4" id="kpis"></div>
+    <div class="chips" id="capChips"></div>
+    <div style="height:16px"></div>
+    <div class="row g32">
+      <div class="card"><h3 data-i18n="cashCurve">Courbe de trésorerie — 52 semaines</h3><div class="sub" data-i18n="cashCurveSub">Solde de clôture hebdomadaire vs. seuil de sécurité</div>
+        <div class="legend"><span style="--c:#2B2622" data-i18n="l.cash">Trésorerie de clôture</span><span style="--c:#B8860B" data-i18n="l.buffer">Seuil de sécurité</span><span style="--c:#B4552F" data-i18n="l.in">Encaissements</span><span style="--c:#4a3aa7" data-i18n="l.out">Décaissements</span></div>
+        <div id="cashChart"></div></div>
+      <div class="card"><h3 data-i18n="revSplit">Revenus mensuels HT</h3><div class="sub" data-i18n="revSplitSub">Retraites femmes vs. location VIP</div>
+        <div class="legend"><span style="--c:#B4552F" data-i18n="l.ret">Retraites</span><span style="--c:#2a78d6" data-i18n="l.vip">Location VIP</span></div>
+        <div id="revChart"></div></div>
+    </div>
+    <div style="height:16px"></div>
+    <div class="row g2">
+      <div class="card"><h3 data-i18n="occ">Calendrier d'occupation</h3><div class="sub" data-i18n="occSub">Semaine par semaine — retraites (terracotta) et séjours VIP (bleu)</div><div class="cal" id="cal"></div></div>
+      <div class="card"><h3 data-i18n="unit">Économie unitaire</h3><div class="sub" data-i18n="unitSub">Contribution après coûts variables et commissions</div><div id="unitTbl"></div></div>
+    </div>
+  </section>
+
+  <!-- HYPOTHESES -->
+  <section class="tab" id="tab-hyp">
+    <div class="toolbar"><button class="btn primary" id="btnReset" data-i18n="b.reset">Réinitialiser (scénario de base)</button><button class="btn" id="btnImport" data-i18n="b.import">Importer JSON / CSV</button><button class="btn" id="btnExportJson2">JSON</button><button class="btn" id="btnExportCsvHyp2" data-i18n="b.csv">Hypothèses → Sheet (CSV)</button></div>
+    <div id="checks"></div>
+    <div class="callout" data-i18n="hypNote">Chaque champ est éditable ; toutes les vues se recalculent instantanément et sont sauvegardées dans ce navigateur. Les clés affichées en gris sont les plages nommées du modèle Google Sheets (synchronisation par CSV).</div>
+    <div class="row g2" id="hypGrid"></div>
+  </section>
+
+  <!-- REVENUS -->
+  <section class="tab" id="tab-rev">
+    <div class="row g3" id="revKpis"></div>
+    <div id="revPanel"></div>
+    <div style="height:16px"></div>
+    <div class="card"><h3 data-i18n="revTable">Revenus mensuels — détail par ligne</h3><div class="sub" data-i18n="revTableSub">HT et TTC, séparés : retraites femmes / location VIP</div>
+      <div class="fbar"><span class="lab" data-i18n="f.show">Afficher</span><button class="chip active" data-revsel="all" data-i18n="f.all">Tous</button><button class="chip r" data-revsel="r" data-i18n="l.ret">Retraites</button><button class="chip v" data-revsel="v" data-i18n="l.vip">Location VIP</button><span class="sep"></span><button class="chip" id="revExpandAll" data-i18n="f.expand">Tout déplier</button><button class="chip" id="revCollapseAll" data-i18n="f.collapse">Tout replier</button></div>
+      <div class="tblwrap" id="revTable"></div></div>
+  </section>
+
+  <!-- CHARGES -->
+  <section class="tab" id="tab-cost">
+    <div class="row g3" id="costKpis"></div>
+    <div id="costPanel"></div>
+    <div style="height:16px"></div>
+    <div class="row g32">
+      <div class="card"><h3 data-i18n="costTable">Structure des charges — Année 1</h3><div class="sub" data-i18n="costTableSub">Variables (par retraite, par participante, par jour VIP) puis fixes</div>
+        <div class="fbar"><span class="lab" data-i18n="f.filters">Filtres</span><button class="chip active" data-fam="all" data-i18n="f.all">Tous</button><button class="chip" data-fam="var" data-i18n="c.cv">Coûts variables</button><button class="chip" data-fam="fix" data-i18n="c.cf">Charges fixes</button><span class="sep"></span><span class="lab">Tag</span><button class="chip r" data-tag="r" data-i18n="act.r">Retraite</button><button class="chip v" data-tag="v">VIP</button><button class="chip" data-tag="c" data-i18n="f.common">Commun</button><span class="sep"></span><span class="lab" data-i18n="f.view">Vue</span><select id="costView"><option value="annual" data-i18n="f.annual">Annuel</option><option value="monthly" data-i18n="f.monthly">Mensuel (moyenne)</option><option value="unit" data-i18n="f.unit">Par unité</option></select><input id="costSearch" placeholder="🔍" ></div>
+        <div class="tbl-hdr-actions"><button id="costExpandAll" data-i18n="f.expand">Tout déplier</button><button id="costCollapseAll" data-i18n="f.collapse">Tout replier</button></div>
+        <div id="costTable"></div></div>
+      <div class="card"><h3 data-i18n="costBars">Répartition des charges</h3><div class="sub" id="costBarsSub" data-i18n="costBarsSub">Part de chaque poste dans le total décaissé</div><div id="costChart"></div></div>
+    </div>
+  </section>
+
+  <!-- CASH -->
+  <section class="tab" id="tab-cash">
+    <div class="row g4" id="cashKpis"></div><div style="height:16px"></div>
+    <div class="card"><h3 data-i18n="cashTable">Plan de trésorerie hebdomadaire</h3><div class="sub" data-i18n="cashTableSub">Encaissements (acomptes / soldes) et décaissements par nature, solde d'ouverture et de clôture</div>
+      <div class="fbar"><button class="chip active" data-cashf="all" data-i18n="f.all">Toutes les semaines</button><button class="chip" data-cashf="act" data-i18n="f.active">Semaines avec activité</button><button class="chip" data-cashf="neg" data-i18n="f.neg">Flux net négatif</button><span class="sep"></span><button class="chip" id="btnExportLedger2" data-i18n="ledgerCsv">Trésorerie (CSV)</button></div>
+      <div class="tblwrap" id="cashTable"></div></div>
+  </section>
+
+  <!-- VIZ -->
+  <section class="tab" id="tab-viz">
+    <div class="row g2">
+      <div class="card"><h3 data-i18n="sens">Sensibilité EBITDA — participantes × prix</h3><div class="sub" data-i18n="sensSub">MAD, année 1 — la case en gras est le scénario courant</div><div id="sens"></div></div>
+      <div class="card"><h3 data-i18n="wf">Du chiffre d'affaires à l'EBITDA</h3><div class="sub" data-i18n="wfSub">Cascade annuelle HT</div><div id="wf"></div></div>
+    </div>
+    <div style="height:16px"></div>
+    <div class="row g2">
+      <div class="card"><h3 data-i18n="be">Point mort</h3><div class="sub" data-i18n="beSub">Participantes par retraite nécessaires pour couvrir les charges fixes (avec / sans VIP)</div><div id="be"></div></div>
+      <div class="card"><h3 data-i18n="mix">Mix d'encaissement par canal</h3><div class="sub" data-i18n="mixSub">Part des réservations et commissions associées</div><div id="mix"></div></div>
+    </div>
+  </section>
+</main>
+<footer>Markarian Realty SARL · Villa Dija, Bahia Golf Beach, Bouznika · <span data-i18n="foot">Business model & prévisions de trésorerie v1.1 — les chiffres proviennent des hypothèses affichées et se recalculent à chaque modification. Document de travail, non audité.</span></footer>
+
+
+<script>
+/* Nûr Retreats — cash-flow engine v1.1 (ES5-safe, shared by the app and the Node test harness).
+   Single source of truth: defaultHypotheses() -> computeModel(h).
+   Schema follows build-prompt v1.1 §5. All amounts in MAD. */
+(function (root) {
+  function defaultHypotheses() {
+    return {
+      meta: { version: '1.1', name: 'Base (hypothèses KEF)' },
+      calendar: { startDate: '2027-01-04', weeks: 52, openingCash: 500000, minCashBuffer: 300000 },
+      retreats: {
+        perMonth: [2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2],
+        participants: 10, capacity: 10, nights: 4,
+        priceTTC: 20000, vatRate: 0.10, avgDiscount: 0.00,
+        depositPct: 0.50, depositLeadWeeks: 6, balanceLeadWeeks: 2,
+        channels: { direct: 0.55, whatsapp: 0.25, platforms: 0.12, agents: 0.08 },
+        platformCommission: 0.15, agentCommission: 0.135, cardFee: 0.02, cardShare: 0.80,
+        varPerRetreat: { yogaTeacher: 10000, soundHealer: 8000, transfers: 4000, laundry: 3000, photo: 3000, misc: 3000 },
+        varPerPax: { fbPerDay: 600, spa: 800, welcomeKit: 500 }
+      },
+      vip: {
+        daysPerMonth: [2, 2, 4, 5, 5, 7, 9, 9, 6, 4, 3, 4],
+        vatRate: 0.10, minStayDays: 2, avgGuests: 6,
+        depositPct: 0.50, depositLeadWeeks: 4, balanceLeadWeeks: 1,
+        cardFee: 0.02, cardShare: 0.50,
+        ventilation: {
+          stayTypes: [
+            { key: 'we', stays: 14, nights: 2, rateTTC: 30000 },
+            { key: 'lwe', stays: 4, nights: 4, rateTTC: 30000 },
+            { key: 'week', stays: 2, nights: 7, rateTTC: 30000 },
+            { key: 'day', stays: 2, nights: 1, rateTTC: 30000 }
+          ],
+          segments: [
+            { key: 'mar', share: 0.40 }, { key: 'gcc', share: 0.30 }, { key: 'eur', share: 0.20 }, { key: 'evt', share: 0.10 }
+          ],
+          channels: [
+            { key: 'direct', share: 0.50, commission: 0.00 },
+            { key: 'concierge', share: 0.30, commission: 0.10 },
+            { key: 'platforms', share: 0.20, commission: 0.15 }
+          ]
+        },
+        varPerDay: { fb: 5000, extraStaff: 2000, driverFuel: 1000, nautical: 1500, laundry: 800, experiences: 1500, amenities: 500 }
+      },
+      payroll: {
+        employerRate: 0.21,
+        permanent: [
+          { role: 'Gérante / Marketing / Vente', n: 1, gross: 8000 },
+          { role: 'Chef cuisine / Service', n: 1, gross: 8000 },
+          { role: 'Femme de ménage', n: 1, gross: 4000 },
+          { role: 'Gouvernante / Femme de chambre', n: 1, gross: 4500 },
+          { role: 'Gardien / Entretien', n: 1, gross: 8000 },
+          { role: 'Chauffeur / Coursier', n: 1, gross: 5000 },
+          { role: 'Resp. Spa / Hammam / Massage', n: 2, gross: 5000 },
+          { role: 'Responsable nautique', n: 1, gross: 5000 }
+        ],
+        seasonal: [
+          { role: 'Cuisine / Service (saison)', n: 1, gross: 5000, fromMonth: 6, toMonth: 9 },
+          { role: 'Entretien (saison)', n: 1, gross: 4000, fromMonth: 6, toMonth: 9 },
+          { role: 'Spa (saison)', n: 1, gross: 4000, fromMonth: 6, toMonth: 9 },
+          { role: 'Nautique (saison)', n: 1, gross: 4000, fromMonth: 6, toMonth: 9 }
+        ]
+      },
+      fixed: {
+        utilitiesMonthly: { eau: 1500, electricite: 4000, telecom: 1500, streaming: 600, gaz: 1200, bois: 600 },
+        suppliesMonthly: { linge: 2500, nettoyage: 1500 },
+        maintenanceMonthly: { pools: 5000, building: 3750, gardens: 1875, nautical: 1875 },
+        marketingAnnual: { meta: 180000, google: 75000, tiktok: 45000, influencers: 90000, content: 60000, pr: 45000, direct: 60000, crm: 30000, contingency: 15000 },
+        marketingFrontLoad: 1.0,
+        insuranceAnnual: { multirisk: 120000, liability: 50000, workAccidents: 30000 }, insuranceWeek: 2,
+        adminMonthly: { accountant: 3000, legal: 1250, licences: 750 },
+        taxesAnnual: { patente: 20000, property: 16000, other: 4000 }, taxesWeek: 10,
+        touristTaxPerPersonNight: 30,
+        intraGroupRentMonthly: 0
+      },
+      tax: { inputVatRecoverable: 0.15, vatPayWeekOfMonth: 3, isRate: 0.20 },
+      financing: {
+        debtServiceIncluded: false,
+        ccaBalance: 3027760, ccaRate: 0.04,
+        loans: [
+          { lender: 'KEF INVEST', principal: 3857000, rate: 0.06, years: 7 },
+          { lender: 'KEF ADVISORY', principal: 2000000, rate: 0.06, years: 7 },
+          { lender: 'PERSEUS', principal: 1616691, rate: 0.06, years: 7 }
+        ],
+        useLegacyDepreciation: false, depreciationLegacy: 44040,
+        depreciation: [
+          { asset: 'Construction', base: 5535560, rate: 0.05 },
+          { asset: 'Équipements', base: 595000, rate: 0.20 },
+          { asset: 'Extérieur', base: 340000, rate: 0.10 },
+          { asset: 'Autres actifs (jet-ski, audio, cinéma)', base: 256331, rate: 0.20 }
+        ],
+        capitalDeployed: 10000001
+      },
+      integration: { endpoint: '', pollMinutes: 5, hypothesesTab: 'NUR_Hypotheses', actualsFeed: false }
+    };
+  }
+
+  function addDays(d, n) { var x = new Date(d.getTime()); x.setUTCDate(x.getUTCDate() + n); return x; }
+  function iso(d) { return d.toISOString().slice(0, 10); }
+  function sum(o) { var s = 0; for (var k in o) if (o.hasOwnProperty(k)) s += (+o[k] || 0); return s; }
+  function clampWeek(w, n) { return w < 0 ? 0 : (w >= n ? n - 1 : w); }
+
+  /* derived quantities used by both the model and the UI */
+  function derive(h) {
+    var R = h.retreats, V = h.vip, F = h.fixed, X = h.financing, d = {};
+    d.priceHT = R.priceTTC * (1 - R.avgDiscount) / (1 + R.vatRate);
+    d.retreatCommRate = R.channels.platforms * R.platformCommission + R.channels.agents * R.agentCommission + R.cardShare * R.cardFee;
+    var vd = 0, vrev = 0, vs = 0, i;
+    for (i = 0; i < V.ventilation.stayTypes.length; i++) { var st = V.ventilation.stayTypes[i]; vd += st.stays * st.nights; vrev += st.stays * st.nights * st.rateTTC; vs += st.stays; }
+    d.ventDays = vd; d.ventStays = vs;
+    d.vipRateTTC = vd ? vrev / vd : 0;
+    d.vipRateHT = d.vipRateTTC / (1 + V.vatRate);
+    var cc = 0, csum = 0; for (i = 0; i < V.ventilation.channels.length; i++) { cc += V.ventilation.channels[i].share * V.ventilation.channels[i].commission; csum += V.ventilation.channels[i].share; }
+    d.vipAgentCommRate = cc; d.vipCommRate = cc + V.cardShare * V.cardFee; d.channelShareSum = csum;
+    var ss = 0; for (i = 0; i < V.ventilation.segments.length; i++) ss += V.ventilation.segments[i].share; d.segmentShareSum = ss;
+    d.gridDays = 0; for (i = 0; i < 12; i++) d.gridDays += (+V.daysPerMonth[i] || 0);
+    d.varRetreatFixed = sum(R.varPerRetreat);
+    d.varPerPax = R.varPerPax.fbPerDay * R.nights + R.varPerPax.spa + R.varPerPax.welcomeKit;
+    d.vipVarPerDay = sum(V.varPerDay);
+    d.utilitiesMonthly = sum(F.utilitiesMonthly); d.suppliesMonthly = sum(F.suppliesMonthly);
+    d.maintenanceMonthly = sum(F.maintenanceMonthly); d.marketingAnnual = sum(F.marketingAnnual);
+    d.insuranceAnnual = sum(F.insuranceAnnual); d.adminMonthly = sum(F.adminMonthly); d.taxesAnnual = sum(F.taxesAnnual);
+    d.depreciationAnnual = X.useLegacyDepreciation ? X.depreciationLegacy : (function () { var t = 0; for (var j = 0; j < X.depreciation.length; j++) t += X.depreciation[j].base * X.depreciation[j].rate; return t; })();
+    d.loanAnnuityMonthly = 0; d.loanPrincipal = 0;
+    for (i = 0; i < X.loans.length; i++) { var L = X.loans[i]; d.loanPrincipal += L.principal; if (L.principal > 0 && L.years > 0) { var r = L.rate / 12, nn = L.years * 12; d.loanAnnuityMonthly += r ? L.principal * r / (1 - Math.pow(1 + r, -nn)) : L.principal / nn; } }
+    d.retreatChannelSum = R.channels.direct + R.channels.whatsapp + R.channels.platforms + R.channels.agents;
+    return d;
+  }
+
+  function computeModel(h) {
+    var N = h.calendar.weeks;
+    var start = new Date(h.calendar.startDate + 'T00:00:00Z');
+    var D = derive(h);
+    var weeks = [], i, m, k;
+    for (i = 0; i < N; i++) {
+      var ws = addDays(start, i * 7);
+      weeks.push({
+        idx: i + 1, start: iso(ws), end: iso(addDays(ws, 6)), month: ws.getUTCMonth(), year: ws.getUTCFullYear(),
+        retreatPax: 0, retreatCount: 0, vipDays: 0, vipStays: 0,
+        inRetreatDeposit: 0, inRetreatBalance: 0, inVipDeposit: 0, inVipBalance: 0,
+        outRetreatVar: 0, outVipVar: 0, outCommissions: 0, outPayroll: 0, outUtilities: 0, outSupplies: 0, outMaintenance: 0,
+        outMarketing: 0, outInsurance: 0, outAdmin: 0, outTaxes: 0, outTouristTax: 0, outRent: 0, outVat: 0, outFinancing: 0,
+        vatCollected: 0, vatDeductible: 0, touristTaxAccrued: 0,
+        revRetreatHT: 0, revVipHT: 0
+      });
+    }
+    function weekOfDate(d) { return Math.floor((d.getTime() - start.getTime()) / (7 * 86400000)); }
+    function weekOfMonthDay(monthIdx, day) { return weekOfDate(new Date(Date.UTC(start.getUTCFullYear(), monthIdx, day))); }
+    var R = h.retreats, V = h.vip, conflicts = [], events = { retreats: [], vip: [] };
+    var retreatsTotal = 0, paxTotal = 0, vipDaysTotal = 0, vipStaysTotal = 0;
+
+    // ---- Retreats: schedule + cash (look 3 months past the horizon for deposits)
+    for (m = 0; m < 15; m++) {
+      var n = R.perMonth[m % 12];
+      var days = n === 1 ? [12] : n === 2 ? [5, 19] : n === 3 ? [3, 13, 23] : n >= 4 ? [2, 9, 16, 23] : [];
+      for (k = 0; k < days.length; k++) {
+        var w = weekOfMonthDay(m, days[k]);
+        if (w < 0) continue;
+        var pax = Math.min(R.participants, R.capacity);
+        var grossTTC = pax * R.priceTTC * (1 - R.avgDiscount);
+        var dep = grossTTC * R.depositPct, bal = grossTTC - dep;
+        var wd = w - R.depositLeadWeeks, wb = w - R.balanceLeadWeeks;
+        var ev = { month: m, day: days[k], week: w, pax: pax, ttc: grossTTC, depWeek: wd, balWeek: wb, inHorizon: w < N };
+        events.retreats.push(ev);
+        if (wd < N) { wd = clampWeek(wd, N); weeks[wd].inRetreatDeposit += dep; weeks[wd].outCommissions += dep * D.retreatCommRate; weeks[wd].vatCollected += dep * R.vatRate / (1 + R.vatRate); }
+        if (wb < N) { wb = clampWeek(wb, N); weeks[wb].inRetreatBalance += bal; weeks[wb].outCommissions += bal * D.retreatCommRate; weeks[wb].vatCollected += bal * R.vatRate / (1 + R.vatRate); }
+        if (w >= N) continue;
+        var wk = weeks[w];
+        wk.retreatPax += pax; wk.retreatCount += 1; retreatsTotal += 1; paxTotal += pax;
+        wk.revRetreatHT += pax * D.priceHT;
+        wk.outRetreatVar += pax * D.varPerPax + (D.varRetreatFixed - R.varPerRetreat.yogaTeacher - R.varPerRetreat.soundHealer);
+        weeks[clampWeek(w + 1, N)].outRetreatVar += R.varPerRetreat.yogaTeacher + R.varPerRetreat.soundHealer;
+        wk.touristTaxAccrued += pax * R.nights * h.fixed.touristTaxPerPersonNight;
+      }
+    }
+    // ---- VIP: stays placed in free slots between retreats
+    for (m = 0; m < 14; m++) {
+      var need = V.daysPerMonth[m % 12];
+      var stays = Math.ceil(need / V.minStayDays);
+      var slots = [10, 12, 14, 16, 24, 26, 28];
+      if (stays > slots.length) { if (m < 12) conflicts.push({ month: m, requested: need, placed: slots.length * V.minStayDays }); stays = slots.length; }
+      for (k = 0; k < stays; k++) {
+        var sd = Math.min(V.minStayDays, need - k * V.minStayDays);
+        if (sd <= 0) break;
+        var vw = weekOfMonthDay(m, slots[k]);
+        if (vw < 0) continue;
+        var vTTC = sd * D.vipRateTTC;
+        var vdep = vTTC * V.depositPct, vbal = vTTC - vdep;
+        var vwd = vw - V.depositLeadWeeks, vwb = vw - V.balanceLeadWeeks;
+        events.vip.push({ month: m, day: slots[k], week: vw, days: sd, ttc: vTTC, depWeek: vwd, balWeek: vwb, inHorizon: vw < N });
+        if (vwd < N) { vwd = clampWeek(vwd, N); weeks[vwd].inVipDeposit += vdep; weeks[vwd].outCommissions += vdep * D.vipCommRate; weeks[vwd].vatCollected += vdep * V.vatRate / (1 + V.vatRate); }
+        if (vwb < N) { vwb = clampWeek(vwb, N); weeks[vwb].inVipBalance += vbal; weeks[vwb].outCommissions += vbal * D.vipCommRate; weeks[vwb].vatCollected += vbal * V.vatRate / (1 + V.vatRate); }
+        if (vw >= N) continue;
+        var vwk = weeks[vw];
+        vwk.vipDays += sd; vwk.vipStays += 1; vipDaysTotal += sd; vipStaysTotal += 1;
+        vwk.revVipHT += sd * D.vipRateHT;
+        vwk.outVipVar += sd * D.vipVarPerDay;
+        vwk.touristTaxAccrued += sd * V.avgGuests * h.fixed.touristTaxPerPersonNight;
+      }
+    }
+    // ---- Payroll, fixed opex, taxes, financing
+    var P = h.payroll, F = h.fixed, X = h.financing;
+    var permMonthly = 0; for (i = 0; i < P.permanent.length; i++) permMonthly += P.permanent[i].n * P.permanent[i].gross;
+    var lastWeekOfMonth = {}, firstWeekOfMonth = {}, secondWeekOfMonth = {}, thirdWeekOfMonth = {};
+    for (i = 0; i < N; i++) { var mm = weeks[i].year * 12 + weeks[i].month; if (firstWeekOfMonth[mm] === undefined) firstWeekOfMonth[mm] = i; lastWeekOfMonth[mm] = i; }
+    for (var key in firstWeekOfMonth) if (firstWeekOfMonth.hasOwnProperty(key)) { secondWeekOfMonth[key] = Math.min(N - 1, firstWeekOfMonth[key] + 1); thirdWeekOfMonth[key] = Math.min(N - 1, firstWeekOfMonth[key] + 2); }
+    var marketingMonthly = D.marketingAnnual / 12, monthsSeen = 0;
+    for (var mk in firstWeekOfMonth) if (firstWeekOfMonth.hasOwnProperty(mk)) {
+      var monthIdx = (+mk) % 12, seas = 0;
+      for (i = 0; i < P.seasonal.length; i++) { var sr = P.seasonal[i]; if (monthIdx + 1 >= sr.fromMonth && monthIdx + 1 <= sr.toMonth) seas += sr.n * sr.gross; }
+      weeks[lastWeekOfMonth[mk]].outPayroll += (permMonthly + seas) * (1 + P.employerRate);
+      weeks[secondWeekOfMonth[mk]].outUtilities += D.utilitiesMonthly;
+      weeks[secondWeekOfMonth[mk]].outSupplies += D.suppliesMonthly;
+      weeks[secondWeekOfMonth[mk]].outMaintenance += D.maintenanceMonthly;
+      weeks[secondWeekOfMonth[mk]].outAdmin += D.adminMonthly;
+      weeks[secondWeekOfMonth[mk]].outRent += F.intraGroupRentMonthly;
+      var fl = monthsSeen < 3 ? F.marketingFrontLoad : (12 - 3 * F.marketingFrontLoad) / 9;
+      weeks[firstWeekOfMonth[mk]].outMarketing += marketingMonthly * fl;
+      if (X.debtServiceIncluded && D.loanAnnuityMonthly > 0) weeks[lastWeekOfMonth[mk]].outFinancing += D.loanAnnuityMonthly;
+      monthsSeen++;
+    }
+    weeks[clampWeek(F.insuranceWeek - 1, N)].outInsurance += D.insuranceAnnual;
+    weeks[clampWeek(F.taxesWeek - 1, N)].outTaxes += D.taxesAnnual;
+    if (X.debtServiceIncluded && X.ccaBalance > 0) for (var q = 0; q < 4; q++) weeks[clampWeek(12 + q * 13, N)].outFinancing += X.ccaBalance * X.ccaRate / 4;
+    // ---- VAT (cash basis) and tourist tax (quarterly)
+    var vatByMonth = {}, ttByQuarter = {};
+    for (i = 0; i < N; i++) {
+      var wkk = weeks[i];
+      var eligible = wkk.outRetreatVar + wkk.outVipVar + wkk.outUtilities + wkk.outSupplies + wkk.outMaintenance + wkk.outMarketing + wkk.outAdmin;
+      wkk.vatDeductible = eligible * h.tax.inputVatRecoverable;
+      var mkey = wkk.year * 12 + wkk.month; vatByMonth[mkey] = (vatByMonth[mkey] || 0) + wkk.vatCollected - wkk.vatDeductible;
+      var qkey = wkk.year * 4 + Math.floor(wkk.month / 3); ttByQuarter[qkey] = (ttByQuarter[qkey] || 0) + wkk.touristTaxAccrued;
+    }
+    for (var vm in vatByMonth) if (vatByMonth.hasOwnProperty(vm)) { var target = thirdWeekOfMonth[(+vm) + 1]; if (target !== undefined) weeks[target].outVat += Math.max(0, vatByMonth[vm]); }
+    for (var qq in ttByQuarter) if (ttByQuarter.hasOwnProperty(qq)) { var nq = (+qq) + 1, tkey = Math.floor(nq / 4) * 12 + (nq % 4) * 3; if (firstWeekOfMonth[tkey] !== undefined) weeks[firstWeekOfMonth[tkey]].outTouristTax += ttByQuarter[qq]; }
+    // ---- Roll cash
+    var cash = h.calendar.openingCash, minCash = cash, minWeek = 0, weeksBelow = 0;
+    for (i = 0; i < N; i++) {
+      var x = weeks[i];
+      x.inflows = x.inRetreatDeposit + x.inRetreatBalance + x.inVipDeposit + x.inVipBalance;
+      x.outFixed = x.outUtilities + x.outSupplies + x.outMaintenance + x.outMarketing + x.outInsurance + x.outAdmin + x.outTaxes + x.outTouristTax + x.outRent;
+      x.outflows = x.outRetreatVar + x.outVipVar + x.outCommissions + x.outPayroll + x.outFixed + x.outVat + x.outFinancing;
+      x.net = x.inflows - x.outflows; x.opening = cash; cash += x.net; x.closing = cash;
+      if (cash < minCash) { minCash = cash; minWeek = i + 1; }
+      if (cash < h.calendar.minCashBuffer) weeksBelow++;
+    }
+    // ---- Annual P&L (HT)
+    var A = { revRetreat: 0, revVip: 0, varRetreat: 0, varVip: 0, commissions: 0, payroll: 0, utilities: 0, supplies: 0, maintenance: 0, marketing: 0, insurance: 0, admin: 0, taxes: 0, touristTax: 0, rent: 0, financing: 0, vatPaid: 0, inflows: 0, outflows: 0 };
+    for (i = 0; i < N; i++) {
+      var y = weeks[i];
+      A.revRetreat += y.revRetreatHT; A.revVip += y.revVipHT; A.varRetreat += y.outRetreatVar; A.varVip += y.outVipVar; A.commissions += y.outCommissions;
+      A.payroll += y.outPayroll; A.utilities += y.outUtilities; A.supplies += y.outSupplies; A.maintenance += y.outMaintenance; A.marketing += y.outMarketing;
+      A.insurance += y.outInsurance; A.admin += y.outAdmin; A.taxes += y.outTaxes; A.touristTax += y.touristTaxAccrued; A.rent += y.outRent; A.financing += y.outFinancing; A.vatPaid += y.outVat;
+      A.inflows += y.inflows; A.outflows += y.outflows;
+    }
+    A.revenue = A.revRetreat + A.revVip;
+    A.commRetreat = A.revRetreat * (1 + R.vatRate) * D.retreatCommRate; A.commVip = A.revVip * (1 + V.vatRate) * D.vipCommRate;
+    A.contribRetreat = A.revRetreat - A.varRetreat - A.commRetreat; A.contribVip = A.revVip - A.varVip - A.commVip;
+    A.fixedTotal = A.payroll + A.utilities + A.supplies + A.maintenance + A.marketing + A.insurance + A.admin + A.taxes + A.touristTax + A.rent;
+    A.ebitda = A.contribRetreat + A.contribVip - A.fixedTotal;
+    A.ebitdaMargin = A.revenue ? A.ebitda / A.revenue : 0;
+    A.depreciation = D.depreciationAnnual;
+    A.interest = X.debtServiceIncluded ? X.ccaBalance * X.ccaRate + D.loanPrincipal * (X.loans.length ? X.loans[0].rate : 0) : 0; // indicative first-year interest
+    A.ebit = A.ebitda - A.depreciation - (X.debtServiceIncluded ? A.interest : 0);
+    A.is = Math.max(0, A.ebit) * h.tax.isRate;
+    A.netResult = A.ebit - A.is;
+    // ---- KPIs
+    var contribPerPax = D.priceHT * (1 - D.retreatCommRate * (1 + R.vatRate)) - D.varPerPax;
+    var contribPerRetreat = retreatsTotal ? A.contribRetreat / retreatsTotal : 0;
+    var contribPerVipDay = vipDaysTotal ? A.contribVip / vipDaysTotal : 0;
+    var bePax = (retreatsTotal && contribPerPax) ? ((A.fixedTotal - A.contribVip) / retreatsTotal + D.varRetreatFixed) / contribPerPax : 0;
+    var bePaxNoVip = (retreatsTotal && contribPerPax) ? (A.fixedTotal / retreatsTotal + D.varRetreatFixed) / contribPerPax : 0;
+    var beVipDays = contribPerVipDay ? (A.fixedTotal - A.contribRetreat) / contribPerVipDay : 0;
+    var checks = {
+      ventilationOk: Math.abs(D.ventDays - D.gridDays) < 0.5,
+      channelsOk: Math.abs(D.channelShareSum - 1) < 1e-6,
+      segmentsOk: Math.abs(D.segmentShareSum - 1) < 1e-6,
+      retreatChannelsOk: Math.abs(D.retreatChannelSum - 1) < 1e-6,
+      capacityOk: R.participants <= R.capacity,
+      conflicts: conflicts
+    };
+    return {
+      weeks: weeks, annual: A, conflicts: conflicts, events: events, derived: D, checks: checks,
+      kpis: {
+        retreats: retreatsTotal, pax: paxTotal, vipDays: vipDaysTotal, vipStays: vipStaysTotal,
+        revenueTTC: A.revRetreat * (1 + R.vatRate) + A.revVip * (1 + V.vatRate),
+        minCash: minCash, minCashWeek: minWeek, weeksBelowBuffer: weeksBelow, closingCash: cash,
+        contribPerPax: contribPerPax, contribPerRetreat: contribPerRetreat, contribPerVipDay: contribPerVipDay,
+        breakEvenPax: bePax, breakEvenPaxNoVip: bePaxNoVip, breakEvenVipDays: beVipDays,
+        retreatCommRate: D.retreatCommRate, vipCommRate: D.vipCommRate, varPerPax: D.varPerPax, varRetreatFixed: D.varRetreatFixed,
+        vipVarPerDay: D.vipVarPerDay, priceHT: D.priceHT, vipRateHT: D.vipRateHT, vipRateTTC: D.vipRateTTC,
+        ebitdaYield: X.capitalDeployed ? A.ebitda / X.capitalDeployed : 0, depreciation: D.depreciationAnnual
+      }
+    };
+  }
+
+  /* Built-in scenarios (full hypothesis sets derived from the base) */
+  function scenario(name) {
+    var h = defaultHypotheses();
+    function vent(we, lwe, week, day) { var st = h.vip.ventilation.stayTypes; st[0].stays = we; st[1].stays = lwe; st[2].stays = week; st[3].stays = day; }
+    if (name === 'ramp') { h.meta.name = 'Montée en charge'; h.retreats.perMonth = [1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2]; h.retreats.participants = 9; h.vip.daysPerMonth = [0, 1, 2, 3, 4, 5, 7, 7, 5, 4, 3, 4]; vent(10, 4, 1, 2); }
+    if (name === 'stress') { h.meta.name = 'Stress'; h.retreats.perMonth = [1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2]; h.retreats.participants = 7; h.vip.daysPerMonth = [0, 0, 1, 2, 2, 3, 4, 4, 3, 2, 2, 2]; h.calendar.openingCash = 300000; vent(7, 2, 0, 3); }
+    if (name === 'playbook') { h.meta.name = 'Playbook Y1'; h.retreats.perMonth = [1, 1, 2, 2, 2, 2, 2, 2, 2, 1, 1, 2]; h.retreats.participants = 9; h.retreats.priceTTC = 16000; h.vip.daysPerMonth = [1, 1, 3, 4, 4, 5, 7, 7, 5, 3, 2, 3]; vent(10, 4, 1, 2); }
+    return h;
+  }
+  root.NurEngine = { defaultHypotheses: defaultHypotheses, computeModel: computeModel, derive: derive, scenario: scenario, VERSION: '1.1' };
+})(typeof window !== 'undefined' ? window : (typeof module !== 'undefined' ? module.exports : this));
+
+</script>
+<script>
+/* ===================== Nûr Retreats — app UI v1.1 (ES5) ===================== */
+var ENDPOINT = ''; // optional Apps Script web-app URL (phase 2, §3.5). Empty = local mode.
+var STORAGE_KEY = 'nur.hypotheses.v1', SCEN_KEY = 'nur.scenarios.v1', UI_KEY = 'nur.ui.v1';
+var I18N = {
+ fr:{subtitle:"Business model & prévisions de trésorerie","mode.local":"v1.1 · MODE LOCAL","mode.live":"v1.1 · SYNCHRONISÉ","mode.stale":"v1.1 · CACHE",print:"Imprimer / PDF",xlsx:"Hypothèses → Sheet (CSV)",ledgerCsv:"Trésorerie (CSV)","t.dash":"Tableau de bord","t.hyp":"Hypothèses","t.rev":"Revenus","t.cost":"Charges","t.cash":"Trésorerie hebdomadaire","t.viz":"Visualisations",scenario:"Scénario :","s.base":"Base (hypothèses KEF)","s.ramp":"Montée en charge","s.stress":"Stress","s.playbook":"Playbook Y1","s.save":"Enregistrer","s.custom":"Scénario personnalisé","s.name":"Nom du scénario ?","s.del":"Supprimer ce scénario ?",cashCurve:"Courbe de trésorerie — 52 semaines",cashCurveSub:"Solde de clôture hebdomadaire vs. seuil de sécurité","l.cash":"Trésorerie de clôture","l.buffer":"Seuil de sécurité","l.in":"Encaissements","l.out":"Décaissements",revSplit:"Revenus mensuels HT",revSplitSub:"Retraites femmes vs. location VIP","l.ret":"Retraites","l.vip":"Location VIP",occ:"Calendrier d'occupation",occSub:"Semaine par semaine — retraites (terracotta) et séjours VIP (bleu)",unit:"Économie unitaire",unitSub:"Contribution après coûts variables et commissions","b.reset":"Réinitialiser (scénario de base)","b.import":"Importer JSON / CSV","b.csv":"Hypothèses → Sheet (CSV)",hypNote:"Chaque champ est éditable ; toutes les vues se recalculent instantanément et sont sauvegardées dans ce navigateur. Les clés en gris sont les plages nommées du modèle Google Sheets (synchronisation par CSV).",revTable:"Revenus mensuels — détail par ligne",revTableSub:"HT et TTC, séparés : retraites femmes / location VIP",costTable:"Structure des charges — Année 1",costTableSub:"Variables (par retraite, par participante, par jour VIP) puis fixes",costBars:"Répartition des charges",costBarsSub:"Part de chaque poste dans le total décaissé",cashTable:"Plan de trésorerie hebdomadaire",cashTableSub:"Encaissements (acomptes / soldes) et décaissements par nature, solde d'ouverture et de clôture",sens:"Sensibilité EBITDA — participantes × prix",sensSub:"MAD, année 1 — la case en gras est le scénario courant",wf:"Du chiffre d'affaires à l'EBITDA",wfSub:"Cascade annuelle HT",be:"Point mort",beSub:"Participantes par retraite nécessaires pour couvrir les charges fixes (avec / sans VIP)",mix:"Mix d'encaissement par canal",mixSub:"Part des réservations et commissions associées",foot:"Business model & prévisions de trésorerie v1.1 — les chiffres proviennent des hypothèses affichées et se recalculent à chaque modification. Document de travail, non audité.",
+  k:{rev:"CA annuel HT",revd:"TTC : ",ret:"Retraites femmes",retd:"retraites · participantes",vip:"Location VIP",vipd:"jours · séjours",ebitda:"EBITDA",ebitdad:"marge",min:"Point bas de trésorerie",mind:"semaine",close:"Trésorerie fin d'année",closed:"ouverture",below:"Semaines sous le seuil",belowd:"seuil",bep:"Point mort / retraite",bepd:"participantes (VIP inclus)",inflow:"Encaissements",outflow:"Décaissements",net:"Flux net"},
+  u:{item:"Poste",ret:"Par retraite",pax:"Par participante",vipd:"Par jour VIP",priceHT:"Prix HT",comm:"Commissions & frais",varc:"Coûts variables",contrib:"Contribution",pct:"Taux de contribution"},
+  cols:{w:"Sem.",dates:"Dates",act:"Activité",rd:"Acomptes retraites",rb:"Soldes retraites",vd:"Acomptes VIP",vb:"Soldes VIP",tin:"Total encaissé",rv:"Var. retraites",vv:"Var. VIP",co:"Commissions",pay:"Salaires",fx:"Fixes",vat:"TVA",fin:"Dette",tout:"Total décaissé",net:"Flux net",open:"Ouverture",close:"Clôture",month:"Mois",nr:"Retraites",np:"Participantes",rht:"Retraites HT",rttc:"Retraites TTC",nv:"Jours VIP",vht:"VIP HT",vttc:"VIP TTC",tot:"Total HT",total:"TOTAL"},
+  scen:{base:"2 retraites/mois × 10 femmes × 20 000 MAD · 60 jours VIP × 30 000 MAD",ramp:"1 retraite/mois (T1) puis 2 ; 9 participantes ; VIP 45 jours",stress:"1 retraite/mois (T1), 7 participantes toute l'année, VIP 25 jours, ouverture 300 kMAD",playbook:"20 retraites × 9 participantes × 16 000 MAD (KPI An 1 du playbook) · VIP 45 jours"},
+  act:{r:"Retraite",v:"VIP"},
+  be:{with:"Avec la contribution VIP",without:"Sans VIP (retraites seules)",fmt:"participantes / retraite",cap:"capacité"},
+  mixc:{direct:"Site direct",whatsapp:"WhatsApp concierge",platforms:"Plateformes (BookRetreats…)",agents:"Agents / TO",comm:"commission"},
+  f:{show:"Afficher",all:"Tous",expand:"Tout déplier",collapse:"Tout replier",filters:"Filtres",view:"Vue",common:"Commun",annual:"Annuel",monthly:"Mensuel (moyenne)",unit:"Par unité",active:"Semaines avec activité",neg:"Flux net négatif"},
+  c:{cv:"Coûts variables",cf:"Charges fixes"},
+  h:{cal:"Calendrier & trésorerie",ret:"Retraites femmes",vip:"Location VIP",vent:"Ventilation des jours VIP",pay:"Masse salariale",fix:"Charges fixes",tax:"Fiscalité",fin:"Financement & capital",integ:"Intégration (phase 2)",start:"Date de début (lundi)",weeks:"Horizon (semaines)",open:"Trésorerie d'ouverture",buf:"Seuil de sécurité",pm:"Retraites / mois",pax:"Participantes / retraite",cap:"Capacité (femmes)",nights:"Nuits / retraite",price:"Prix / participante TTC",vat:"TVA",disc:"Remise moyenne",dep:"Acompte",depl:"Acompte reçu (sem. avant)",ball:"Solde reçu (sem. avant)",chd:"Canal direct",chw:"Canal WhatsApp",chp:"Canal plateformes",cha:"Canal agents / TO",pc:"Commission plateformes",ac:"Commission agents",cf:"Frais CB",cs:"Part payée par CB",yoga:"Prof. yoga / retraite",sound:"Sound healer / retraite",tr:"Transferts / retraite",la:"Blanchisserie / retraite",ph:"Photo & contenu / retraite",mi:"Divers / retraite",fb:"F&B / participante / jour",spa:"Soins spa / participante",kit:"Kit de bienvenue / participante",vd:"Jours VIP / mois",ms:"Séjour minimum (jours)",ag:"Invités moyens / jour",vfb:"F&B / jour",vst:"Personnel extra / jour",vdr:"Chauffeur & carburant / jour",vna:"Jetski & RIB / jour",vla:"Blanchisserie / jour",vex:"Expériences / jour",vam:"Amenities / jour",stays:"Séjours",nightsC:"Nuits",rate:"Tarif / jour TTC",share:"Part",commission:"Commission",er:"Charges patronales",role:"Rôle",n:"Effectif",gross:"Brut mensuel",from:"De (mois)",to:"À (mois)",perm:"Permanents",seas:"Saisonniers",util:"Utilities / mois",sup:"Fournitures / mois",mai:"Maintenance / mois",mk:"Marketing / an",fl:"Front-load marketing (mois 1–3)",ins:"Assurances / an",insw:"Semaine de paiement assurance",adm:"Honoraires & admin / mois",tx:"Patente & taxes / an",txw:"Semaine de paiement taxes",tt:"Taxe de séjour / personne-nuit",rent:"Loyer intra-groupe / mois",ivat:"TVA déductible (taux blended)",is:"Taux IS",debt:"Service de la dette porté par l'exploitation",cca:"Solde CCA",ccar:"Taux CCA",lender:"Prêteur",principal:"Principal",lrate:"Taux",years:"Durée (ans)",legacy:"Utiliser l'amortissement hérité (44 040)",legacyAmt:"Amortissement hérité / an",asset:"Actif",base:"Base",drate:"Taux",cap2:"Capital déployé",endpoint:"URL Apps Script (vide = mode local)",derived:"Valeurs dérivées"},
+  chk:{ok:"Toutes les cohérences sont respectées.",vent:"Ventilation VIP : les jours par type de séjour ({a}) ne correspondent pas à la grille mensuelle ({b}).",ch:"Les parts des canaux VIP ne totalisent pas 100 %.",sg:"Les parts des segments VIP ne totalisent pas 100 %.",rch:"Les parts des canaux retraites ne totalisent pas 100 %.",cap:"Participantes > capacité : les retraites sont plafonnées à la capacité.",conf:"Conflit de planning : mois {m} — {a} jours VIP demandés, {b} placés (créneaux libres épuisés)."},
+  d:{slots:"créneaux planifiés",close:"fermer",details:"détails",detail:"détail",capDeployed:"Capital déployé",ebitdaYield:"Rendement EBITDA / capital",deprAsset:"Amortissements",legacy:"hérité",debt:"Dette de construction",loans:"prêts",debtOff:"hors périmètre (switch = non)",debtOn:"service de la dette inclus dans la trésorerie",perRetreat:"Par retraite",perVipDay:"Par jour VIP",facil:"Facilitateurs (yoga, sound healer)",fb:"F&B participantes",spa:"Soins spa",kit:"Kit de bienvenue",transfers:"Transferts",laundry:"Blanchisserie",photo:"Photo & contenu",misc:"Divers",platforms:"Plateformes",agents:"Agents / TO",card:"Frais CB",concierge:"Conciergeries & agents",extraStaff:"Personnel extra",driver:"Chauffeur & carburant",experiences:"Expériences (golf, cuisine, poterie)",pools:"Piscines & spa",building:"Bâtiment",gardens:"Jardins",nauticalEq:"Équipements nautiques",mk_meta:"Meta Ads",mk_google:"Google Ads",mk_tiktok:"TikTok Ads",mk_influencers:"Influenceurs",mk_content:"Contenu & photo",mk_pr:"PR & médias",mk_direct:"Marketing direct & events",mk_crm:"CRM / tech",mk_contingency:"Contingence",multirisk:"Multirisque",liability:"RC exploitation",workAccidents:"Accidents du travail",accountant:"Comptable",legal:"Juridique",licences:"Licences & abonnements",patente:"Patente / TSC",property:"Taxe foncière",other:"Autres",rentLine:"Loyer mensuel",ofRev:"du CA",varc:"Coûts variables",comm:"Commissions & frais",contrib:"Contribution",monthlyProfile:"Profil mensuel",splitRV:"Retraites / VIP",composition:"Composition",insSpike:"pic = assurance",coverage:"Couverture des fixes",coverageSub:"contribution ÷ charges fixes",totalCosts:"Total charges (hors TVA, IS, dette)",filtered:"filtré",shareOf:"Part de chaque poste dans",unitEcon:"Économie unitaire",channelMix:"Mix de canaux",share:"Part",schedule:"Calendrier",retreat:"Retraite",depositWk:"acompte",balanceWk:"solde",paxSens:"Sensibilité participantes",ventilation:"ventilation des jours",days:"jours",byStay:"Par type de séjour",stays:"Séjours",rate:"Tarif",consistency:"cohérence jours",blended:"tarif blended",bySegment:"Par segment client",byChannel:"Par canal",monthlyGrid:"Grille mensuelle (jours)",stay:"Séjour",contribDay:"Contribution / jour",contribStay:"/ séjour",st_we:"Week-end (2 nuits)",st_lwe:"Long week-end / férié (4 nuits)",st_week:"Semaine complète (7 nuits)",st_day:"Événement / shooting (1 jour)",sg_mar:"Familles HNW Maroc (Casa / Rabat)",sg_gcc:"Familles GCC",sg_eur:"Européens / corporate",sg_evt:"Événements & productions",ch_direct:"Direct & referral",ch_concierge:"Conciergeries & agents",ch_platforms:"Plateformes villas",eau:"Eau",electricite:"Électricité",telecom:"Télécom",streaming:"Streaming",gaz:"Gaz",bois:"Bois",linge:"Linge",nettoyage:"Nettoyage",nautical:"Équipements nautiques",vipDebt:"Dette"}
+ },
+ en:{subtitle:"Business model & cash-flow forecast","mode.local":"v1.1 · LOCAL MODE","mode.live":"v1.1 · SYNCED","mode.stale":"v1.1 · CACHED",print:"Print / PDF",xlsx:"Assumptions → Sheet (CSV)",ledgerCsv:"Cash-flow (CSV)","t.dash":"Dashboard","t.hyp":"Assumptions","t.rev":"Revenues","t.cost":"Expenses","t.cash":"Weekly cash-flow","t.viz":"Visualisations",scenario:"Scenario:","s.base":"Base (KEF assumptions)","s.ramp":"Ramp-up","s.stress":"Stress","s.playbook":"Playbook Y1","s.save":"Save","s.custom":"Custom scenario","s.name":"Scenario name?","s.del":"Delete this scenario?",cashCurve:"Cash curve — 52 weeks",cashCurveSub:"Weekly closing balance vs. safety buffer","l.cash":"Closing cash","l.buffer":"Safety buffer","l.in":"Receipts","l.out":"Payments",revSplit:"Monthly revenue (ex-VAT)",revSplitSub:"Women's retreats vs. VIP rental","l.ret":"Retreats","l.vip":"VIP rental",occ:"Occupancy calendar",occSub:"Week by week — retreats (terracotta) and VIP stays (blue)",unit:"Unit economics",unitSub:"Contribution after variable costs and commissions","b.reset":"Reset (base scenario)","b.import":"Import JSON / CSV","b.csv":"Assumptions → Sheet (CSV)",hypNote:"Every field is editable; all views recalculate instantly and are saved in this browser. Grey keys are the named ranges of the Google Sheets model (CSV sync).",revTable:"Monthly revenue — by line",revTableSub:"Ex-VAT and incl. VAT, separated: women's retreats / VIP rental",costTable:"Cost structure — Year 1",costTableSub:"Variable (per retreat, per participant, per VIP day) then fixed",costBars:"Cost breakdown",costBarsSub:"Share of each item in total payments",cashTable:"Weekly cash plan",cashTableSub:"Receipts (deposits / balances) and payments by nature, opening and closing balance",sens:"EBITDA sensitivity — participants × price",sensSub:"MAD, year 1 — bold cell is the current scenario",wf:"From revenue to EBITDA",wfSub:"Annual waterfall, ex-VAT",be:"Break-even",beSub:"Participants per retreat needed to cover fixed costs (with / without VIP)",mix:"Booking channel mix",mixSub:"Share of bookings and related commissions",foot:"Business model & cash-flow forecast v1.1 — figures come from the displayed assumptions and recalculate on every change. Working document, unaudited.",
+  k:{rev:"Annual revenue (ex-VAT)",revd:"incl. VAT: ",ret:"Women's retreats",retd:"retreats · participants",vip:"VIP rental",vipd:"days · stays",ebitda:"EBITDA",ebitdad:"margin",min:"Cash low point",mind:"week",close:"Year-end cash",closed:"opening",below:"Weeks below buffer",belowd:"buffer",bep:"Break-even / retreat",bepd:"participants (incl. VIP)",inflow:"Receipts",outflow:"Payments",net:"Net flow"},
+  u:{item:"Item",ret:"Per retreat",pax:"Per participant",vipd:"Per VIP day",priceHT:"Price ex-VAT",comm:"Commissions & fees",varc:"Variable costs",contrib:"Contribution",pct:"Contribution rate"},
+  cols:{w:"Wk",dates:"Dates",act:"Activity",rd:"Retreat deposits",rb:"Retreat balances",vd:"VIP deposits",vb:"VIP balances",tin:"Total receipts",rv:"Retreat var.",vv:"VIP var.",co:"Commissions",pay:"Payroll",fx:"Fixed",vat:"VAT",fin:"Debt",tout:"Total payments",net:"Net flow",open:"Opening",close:"Closing",month:"Month",nr:"Retreats",np:"Participants",rht:"Retreats ex-VAT",rttc:"Retreats incl. VAT",nv:"VIP days",vht:"VIP ex-VAT",vttc:"VIP incl. VAT",tot:"Total ex-VAT",total:"TOTAL"},
+  scen:{base:"2 retreats/month × 10 women × MAD 20,000 · 60 VIP days × MAD 30,000",ramp:"1 retreat/month (Q1) then 2; 9 participants; VIP 45 days",stress:"1 retreat/month (Q1), 7 participants all year, VIP 25 days, opening cash MAD 300k",playbook:"20 retreats × 9 participants × MAD 16,000 (playbook Year-1 KPI) · VIP 45 days"},
+  act:{r:"Retreat",v:"VIP"},
+  be:{with:"With VIP contribution",without:"Without VIP (retreats only)",fmt:"participants / retreat",cap:"capacity"},
+  mixc:{direct:"Direct website",whatsapp:"WhatsApp concierge",platforms:"Platforms (BookRetreats…)",agents:"Agents / tour operators",comm:"commission"},
+  f:{show:"Show",all:"All",expand:"Expand all",collapse:"Collapse all",filters:"Filters",view:"View",common:"Shared",annual:"Annual",monthly:"Monthly (average)",unit:"Per unit",active:"Weeks with activity",neg:"Negative net flow"},
+  c:{cv:"Variable costs",cf:"Fixed costs"},
+  h:{cal:"Calendar & cash",ret:"Women's retreats",vip:"VIP rental",vent:"VIP days ventilation",pay:"Payroll",fix:"Fixed costs",tax:"Tax",fin:"Financing & capital",integ:"Integration (phase 2)",start:"Start date (Monday)",weeks:"Horizon (weeks)",open:"Opening cash",buf:"Safety buffer",pm:"Retreats / month",pax:"Participants / retreat",cap:"Capacity (women)",nights:"Nights / retreat",price:"Price / participant incl. VAT",vat:"VAT",disc:"Average discount",dep:"Deposit",depl:"Deposit received (weeks before)",ball:"Balance received (weeks before)",chd:"Direct channel",chw:"WhatsApp channel",chp:"Platforms channel",cha:"Agents / TO channel",pc:"Platform commission",ac:"Agent commission",cf:"Card fee",cs:"Share paid by card",yoga:"Yoga teacher / retreat",sound:"Sound healer / retreat",tr:"Transfers / retreat",la:"Laundry / retreat",ph:"Photo & content / retreat",mi:"Misc / retreat",fb:"F&B / participant / day",spa:"Spa treatments / participant",kit:"Welcome kit / participant",vd:"VIP days / month",ms:"Minimum stay (days)",ag:"Average guests / day",vfb:"F&B / day",vst:"Extra staff / day",vdr:"Driver & fuel / day",vna:"Jetski & RIB / day",vla:"Laundry / day",vex:"Experiences / day",vam:"Amenities / day",stays:"Stays",nightsC:"Nights",rate:"Rate / day incl. VAT",share:"Share",commission:"Commission",er:"Employer charges",role:"Role",n:"Headcount",gross:"Monthly gross",from:"From (month)",to:"To (month)",perm:"Permanent",seas:"Seasonal",util:"Utilities / month",sup:"Supplies / month",mai:"Maintenance / month",mk:"Marketing / year",fl:"Marketing front-load (months 1–3)",ins:"Insurance / year",insw:"Insurance payment week",adm:"Fees & admin / month",tx:"Business & local taxes / year",txw:"Taxes payment week",tt:"Tourist tax / person-night",rent:"Intra-group rent / month",ivat:"Recoverable VAT (blended rate)",is:"Corporate tax rate",debt:"Debt service carried by the operator",cca:"CCA balance",ccar:"CCA rate",lender:"Lender",principal:"Principal",lrate:"Rate",years:"Years",legacy:"Use legacy depreciation (44,040)",legacyAmt:"Legacy depreciation / year",asset:"Asset",base:"Base",drate:"Rate",cap2:"Capital deployed",endpoint:"Apps Script URL (empty = local mode)",derived:"Derived values"},
+  chk:{ok:"All consistency checks pass.",vent:"VIP ventilation: days by stay type ({a}) do not match the monthly grid ({b}).",ch:"VIP channel shares do not sum to 100 %.",sg:"VIP segment shares do not sum to 100 %.",rch:"Retreat channel shares do not sum to 100 %.",cap:"Participants > capacity: retreats are capped at capacity.",conf:"Scheduling conflict: month {m} — {a} VIP days requested, {b} placed (free slots exhausted)."},
+  d:{slots:"scheduled slots",close:"close",details:"details",detail:"detail",capDeployed:"Capital deployed",ebitdaYield:"EBITDA yield on capital",deprAsset:"Depreciation",legacy:"legacy",debt:"Construction debt",loans:"loans",debtOff:"out of scope (switch = off)",debtOn:"debt service included in the cash-flow",perRetreat:"Per retreat",perVipDay:"Per VIP day",facil:"Facilitators (yoga, sound healer)",fb:"F&B participants",spa:"Spa treatments",kit:"Welcome kit",transfers:"Transfers",laundry:"Laundry",photo:"Photo & content",misc:"Misc",platforms:"Platforms",agents:"Agents / TO",card:"Card fees",concierge:"Concierges & agents",extraStaff:"Extra staff",driver:"Driver & fuel",experiences:"Experiences (golf, cooking, pottery)",pools:"Pools & spa",building:"Building",gardens:"Gardens",nauticalEq:"Nautical equipment",mk_meta:"Meta Ads",mk_google:"Google Ads",mk_tiktok:"TikTok Ads",mk_influencers:"Influencers",mk_content:"Content & photo",mk_pr:"PR & media",mk_direct:"Direct marketing & events",mk_crm:"CRM / tech",mk_contingency:"Contingency",multirisk:"Multi-risk",liability:"Liability",workAccidents:"Work accidents",accountant:"Accountant",legal:"Legal",licences:"Licences & subscriptions",patente:"Business tax / TSC",property:"Property tax",other:"Other",rentLine:"Monthly rent",ofRev:"of revenue",varc:"Variable costs",comm:"Commissions & fees",contrib:"Contribution",monthlyProfile:"Monthly profile",splitRV:"Retreats / VIP",composition:"Composition",insSpike:"spike = insurance",coverage:"Fixed-cost coverage",coverageSub:"contribution ÷ fixed costs",totalCosts:"Total costs (ex VAT, tax, debt)",filtered:"filtered",shareOf:"Share of each item in",unitEcon:"Unit economics",channelMix:"Channel mix",share:"Share",schedule:"Schedule",retreat:"Retreat",depositWk:"deposit",balanceWk:"balance",paxSens:"Participants sensitivity",ventilation:"ventilation of days",days:"days",byStay:"By stay type",stays:"Stays",rate:"Rate",consistency:"days consistency",blended:"blended rate",bySegment:"By client segment",byChannel:"By channel",monthlyGrid:"Monthly grid (days)",stay:"Stay",contribDay:"Contribution / day",contribStay:"/ stay",st_we:"Week-end (2 nights)",st_lwe:"Long week-end / holiday (4 nights)",st_week:"Full week (7 nights)",st_day:"Event / shooting (1 day)",sg_mar:"Moroccan HNW families (Casa / Rabat)",sg_gcc:"GCC families",sg_eur:"European / corporate",sg_evt:"Events & productions",ch_direct:"Direct & referral",ch_concierge:"Concierges & agents",ch_platforms:"Villa platforms",eau:"Water",electricite:"Electricity",telecom:"Telecom",streaming:"Streaming",gaz:"Gas",bois:"Firewood",linge:"Linen",nettoyage:"Cleaning",nautical:"Nautical equipment",vipDebt:"Debt"}
+ }
+};
+var LANG='fr', SCEN='base', DIRTY=false, MONTHS={fr:["Jan","Fév","Mar","Avr","Mai","Juin","Juil","Août","Sep","Oct","Nov","Déc"],en:["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"]};
+function T(k){var d=I18N[LANG];var p=k.split('.');if(p.length===2&&typeof d[p[0]]==='object'&&d[p[0]]!==null&&d[p[0]][p[1]]!==undefined)return d[p[0]][p[1]];return d[k]!==undefined?d[k]:k}
+function D(k){var v=I18N[LANG].d[k];return v!==undefined?v:T(k)}
+function fmt(x){x=Math.round(x||0);var s=Math.abs(x).toString().replace(/\B(?=(\d{3})+(?!\d))/g,LANG==='fr'?' ':',');return (x<0?'−':'')+s}
+function fmtK(x){return ((x||0)<0?'−':'')+(Math.abs(x||0)/1000).toFixed(0)+' k'}
+function pct(x){x=x||0;return (x*100).toFixed(x*100%1?1:0)+' %'}
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;')}
+function clone(o){return JSON.parse(JSON.stringify(o))}
+function store(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
+function load(k){try{var v=localStorage.getItem(k);return v?JSON.parse(v):null}catch(e){return null}}
+/* ---------- state ---------- */
+var H, M, CUSTOM=load(SCEN_KEY)||{};
+function setScenario(name){SCEN=name;DIRTY=false;H=CUSTOM[name]?clone(CUSTOM[name]):(name==='base'?NurEngine.defaultHypotheses():NurEngine.scenario(name));recompute();}
+function recompute(){M=NurEngine.computeModel(H);store(STORAGE_KEY,{scen:SCEN,dirty:DIRTY,h:H,lang:LANG});renderAll();}
+function markDirty(){DIRTY=true;recompute();}
+/* ---------- hypothesis paths ---------- */
+function getPath(o,p){var a=p.split('.');for(var i=0;i<a.length;i++){if(o==null)return undefined;o=o[a[i]];}return o}
+function setPath(o,p,v){var a=p.split('.');for(var i=0;i<a.length-1;i++){o=o[a[i]];}o[a[a.length-1]]=v}
+/* flatten hypotheses to key/value pairs matching the Sheet named ranges */
+function flatten(h){var out=[];
+  function put(k,v){out.push([k,v])}
+  put('calendar_startDate',h.calendar.startDate);put('calendar_weeks',h.calendar.weeks);put('calendar_openingCash',h.calendar.openingCash);put('calendar_minCashBuffer',h.calendar.minCashBuffer);
+  var R=h.retreats,i;for(i=0;i<12;i++)put('retreats_perMonth_'+(i+1),R.perMonth[i]);
+  ['participants','capacity','nights','priceTTC','vatRate','avgDiscount','depositPct','depositLeadWeeks','balanceLeadWeeks','platformCommission','agentCommission','cardFee','cardShare'].forEach(function(k){put('retreats_'+k,R[k])});
+  ['direct','whatsapp','platforms','agents'].forEach(function(k){put('retreats_channels_'+k,R.channels[k])});
+  for(var k in R.varPerRetreat)put('retreats_varPerRetreat_'+k,R.varPerRetreat[k]);for(k in R.varPerPax)put('retreats_varPerPax_'+k,R.varPerPax[k]);
+  var V=h.vip;for(i=0;i<12;i++)put('vip_daysPerMonth_'+(i+1),V.daysPerMonth[i]);
+  ['vatRate','minStayDays','avgGuests','depositPct','depositLeadWeeks','balanceLeadWeeks','cardFee','cardShare'].forEach(function(k){put('vip_'+k,V[k])});
+  for(k in V.varPerDay)put('vip_varPerDay_'+k,V.varPerDay[k]);
+  V.ventilation.stayTypes.forEach(function(s,j){put('vip_stayTypes_stays_'+(j+1),s.stays);put('vip_stayTypes_nights_'+(j+1),s.nights);put('vip_stayTypes_rateTTC_'+(j+1),s.rateTTC)});
+  V.ventilation.segments.forEach(function(s,j){put('vip_segments_share_'+(j+1),s.share)});
+  V.ventilation.channels.forEach(function(s,j){put('vip_channels_share_'+(j+1),s.share);put('vip_channels_commission_'+(j+1),s.commission)});
+  put('payroll_employerRate',h.payroll.employerRate);
+  h.payroll.permanent.forEach(function(r,j){put('payroll_permanent_n_'+(j+1),r.n);put('payroll_permanent_gross_'+(j+1),r.gross)});
+  h.payroll.seasonal.forEach(function(r,j){put('payroll_seasonal_n_'+(j+1),r.n);put('payroll_seasonal_gross_'+(j+1),r.gross);put('payroll_seasonal_fromMonth_'+(j+1),r.fromMonth);put('payroll_seasonal_toMonth_'+(j+1),r.toMonth)});
+  var F=h.fixed;['utilitiesMonthly','suppliesMonthly','maintenanceMonthly','marketingAnnual','insuranceAnnual','adminMonthly','taxesAnnual'].forEach(function(g){for(var k in F[g])put('fixed_'+g+'_'+k,F[g][k])});
+  ['marketingFrontLoad','insuranceWeek','taxesWeek','touristTaxPerPersonNight','intraGroupRentMonthly'].forEach(function(k){put('fixed_'+k,F[k])});
+  put('tax_inputVatRecoverable',h.tax.inputVatRecoverable);put('tax_isRate',h.tax.isRate);
+  var X=h.financing;put('financing_debtServiceIncluded',X.debtServiceIncluded?1:0);put('financing_ccaBalance',X.ccaBalance);put('financing_ccaRate',X.ccaRate);
+  X.loans.forEach(function(l,j){put('financing_loans_principal_'+(j+1),l.principal);put('financing_loans_rate_'+(j+1),l.rate);put('financing_loans_years_'+(j+1),l.years)});
+  put('financing_useLegacyDepreciation',X.useLegacyDepreciation?1:0);put('financing_depreciationLegacy',X.depreciationLegacy);
+  X.depreciation.forEach(function(a,j){put('financing_depreciation_base_'+(j+1),a.base);put('financing_depreciation_rate_'+(j+1),a.rate)});
+  put('financing_capitalDeployed',X.capitalDeployed);
+  return out;}
+function applyFlat(h,pairs){var n=0;pairs.forEach(function(p){var k=p[0],v=p[1];if(v===''||v===undefined)return;var num=(typeof v==='string')?parseFloat(String(v).replace(/\s/g,'').replace(',','.')):v;var m;
+  if(k==='calendar_startDate'){h.calendar.startDate=String(v).slice(0,10);n++;return}
+  if((m=k.match(/^retreats_perMonth_(\d+)$/))){h.retreats.perMonth[+m[1]-1]=num;n++;return}
+  if((m=k.match(/^vip_daysPerMonth_(\d+)$/))){h.vip.daysPerMonth[+m[1]-1]=num;n++;return}
+  if((m=k.match(/^vip_stayTypes_(stays|nights|rateTTC)_(\d+)$/))){var s=h.vip.ventilation.stayTypes[+m[2]-1];if(s){s[m[1]]=num;n++}return}
+  if((m=k.match(/^vip_segments_share_(\d+)$/))){var g=h.vip.ventilation.segments[+m[1]-1];if(g){g.share=num;n++}return}
+  if((m=k.match(/^vip_channels_(share|commission)_(\d+)$/))){var c=h.vip.ventilation.channels[+m[2]-1];if(c){c[m[1]]=num;n++}return}
+  if((m=k.match(/^payroll_(permanent|seasonal)_(n|gross|fromMonth|toMonth)_(\d+)$/))){var r=h.payroll[m[1]][+m[3]-1];if(r){r[m[2]]=num;n++}return}
+  if((m=k.match(/^financing_loans_(principal|rate|years)_(\d+)$/))){var l=h.financing.loans[+m[2]-1];if(l){l[m[1]]=num;n++}return}
+  if((m=k.match(/^financing_depreciation_(base|rate)_(\d+)$/))){var a=h.financing.depreciation[+m[2]-1];if(a){a[m[1]]=num;n++}return}
+  if(k==='financing_debtServiceIncluded'){h.financing.debtServiceIncluded=num===1;n++;return}
+  if(k==='financing_useLegacyDepreciation'){h.financing.useLegacyDepreciation=num===1;n++;return}
+  if((m=k.match(/^(retreats|vip|fixed)_(varPerRetreat|varPerPax|channels|varPerDay|utilitiesMonthly|suppliesMonthly|maintenanceMonthly|marketingAnnual|insuranceAnnual|adminMonthly|taxesAnnual)_([A-Za-z]+)$/))){if(h[m[1]][m[2]]&&h[m[1]][m[2]][m[3]]!==undefined){h[m[1]][m[2]][m[3]]=num;n++}return}
+  if((m=k.match(/^(calendar|retreats|vip|payroll|fixed|tax|financing)_([A-Za-z]+)$/))){if(h[m[1]]&&typeof h[m[1]][m[2]]==='number'){h[m[1]][m[2]]=num;n++}return}
+  });return n;}
+/* ---------- exports ---------- */
+function download(name,text,type){var b=new Blob([text],{type:type||'text/plain;charset=utf-8'});var a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=name;document.body.appendChild(a);a.click();setTimeout(function(){document.body.removeChild(a);URL.revokeObjectURL(a.href)},500)}
+function stamp(){var d=new Date();function p(x){return (x<10?'0':'')+x}return d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate())+'_'+p(d.getHours())+'h'+p(d.getMinutes())}
+function exportJson(){download('Nur_hypotheses_'+SCEN+'_'+stamp()+'.json',JSON.stringify({meta:{app:'Nur Retreats cash-flow v1.1',scenario:SCEN,exportedAt:new Date().toISOString()},hypotheses:H},null,1),'application/json')}
+function exportCsvHyp(){var rows=flatten(H).map(function(p){return p[0]+';'+p[1]});download('Nur_hypotheses_'+SCEN+'_'+stamp()+'.csv','key;value\n'+rows.join('\n'),'text/csv;charset=utf-8')}
+function exportLedger(){var W=M.weeks,c=I18N[LANG].cols,hd=[c.w,c.dates,c.nr,c.np,c.nv,c.rd,c.rb,c.vd,c.vb,c.tin,c.rv,c.vv,c.co,c.pay,c.fx,c.vat,c.fin,c.tout,c.net,c.open,c.close];
+  var lines=[hd.join(';')];W.forEach(function(x){lines.push([x.idx,x.start+' → '+x.end,x.retreatCount,x.retreatPax,x.vipDays,x.inRetreatDeposit,x.inRetreatBalance,x.inVipDeposit,x.inVipBalance,x.inflows,x.outRetreatVar,x.outVipVar,x.outCommissions,x.outPayroll,x.outFixed,x.outVat,x.outFinancing,x.outflows,x.net,x.opening,x.closing].map(function(v){return typeof v==='number'?Math.round(v):v}).join(';'))});
+  download('Nur_cashflow_weekly_'+SCEN+'_'+stamp()+'.csv',lines.join('\n'),'text/csv;charset=utf-8')}
+function importFile(file){var rd=new FileReader();rd.onload=function(){var txt=rd.result;try{if(/^\s*\{/.test(txt)){var o=JSON.parse(txt);var h=o.hypotheses||o;if(!h.calendar||!h.retreats)throw new Error('schema');H=h;if(!H.meta)H.meta={};H.meta.name=(H.meta.name||'')+' (import)';SCEN='custom';DIRTY=true;recompute();alert(LANG==='fr'?'Hypothèses importées (JSON).':'Assumptions imported (JSON).');}
+  else{var pairs=txt.split(/\r?\n/).map(function(l){var m=l.split(/[;,\t]/);return [String(m[0]||'').trim(),(m[1]||'').trim()]}).filter(function(p){return p[0]&&p[0]!=='key'});var n=applyFlat(H,pairs);DIRTY=true;recompute();alert((LANG==='fr'?'Valeurs appliquées : ':'Values applied: ')+n);}}catch(e){alert('Import error: '+e.message)}};rd.readAsText(file)}
+/* ---------- UI ---------- */
+function setLang(l){LANG=l;document.getElementById('langFR').classList.toggle('active',l==='fr');document.getElementById('langEN').classList.toggle('active',l==='en');document.documentElement.lang=l;
+  var els=document.querySelectorAll('[data-i18n]');for(var i=0;i<els.length;i++){els[i].textContent=T(els[i].getAttribute('data-i18n'));}recompute();}
+function kpi(cls,lbl,val,delta){return '<div class="card kpi '+cls+'"><div class="lbl">'+lbl+'</div><div class="val">'+val+'</div><div class="delta">'+delta+'</div></div>'}
+function tile(cls,lbl,val,delta,id,active){return '<div class="card kpi btn-tile '+cls+(active?' active':'')+'" data-tile="'+id+'" role="button" aria-pressed="'+(active?'true':'false')+'"><span class="hint">'+(active?'▼ '+D('close'):'+ '+D('details'))+'</span><div class="lbl">'+lbl+'</div><div class="val">'+val+'</div><div class="delta">'+delta+'</div></div>'}
+function miniBars(arr,cls){var mx=0,i;for(i=0;i<arr.length;i++)mx=Math.max(mx,arr[i]);var s='<div class="mini">';for(i=0;i<arr.length;i++)s+='<div class="'+(cls||'')+'" style="height:'+(mx?arr[i]/mx*100:0)+'%" title="'+fmt(arr[i])+'"><span>'+MONTHS[LANG][i].slice(0,3)+'</span></div>';return s+'</div><div style="height:18px"></div>'}
+function monthly(W){var out=[];for(var i=0;i<12;i++)out.push({r:0,v:0,nr:0,np:0,nv:0,ns:0});for(var j=0;j<W.length;j++){var md=new Date(W[j].start+'T00:00:00Z');md.setUTCDate(md.getUTCDate()+3);if(md.getUTCFullYear()!==W[0].year)continue;var m=md.getUTCMonth();out[m].r+=W[j].revRetreatHT;out[m].v+=W[j].revVipHT;out[m].nr+=W[j].retreatCount;out[m].np+=W[j].retreatPax;out[m].nv+=W[j].vipDays;out[m].ns+=W[j].vipStays;}return out}
+function monthlyCosts(W){var v=[],f=[],i;for(i=0;i<12;i++){v.push(0);f.push(0)}for(var j=0;j<W.length;j++){var md=new Date(W[j].start+'T00:00:00Z');md.setUTCDate(md.getUTCDate()+3);if(md.getUTCFullYear()!==W[0].year)continue;var m=md.getUTCMonth(),x=W[j];v[m]+=x.outRetreatVar+x.outVipVar+x.outCommissions;f[m]+=x.outPayroll+x.outFixed+x.outFinancing}return {v:v,f:f}}
+function renderScenarioBar(){var s='';for(var k in CUSTOM)if(CUSTOM.hasOwnProperty(k))s+='<button class="chip custom'+(SCEN===k?' active':'')+'" data-scen="'+esc(k)+'" title="'+(LANG==='fr'?'clic droit : supprimer':'right-click: delete')+'">'+esc(k)+'</button>';
+  document.getElementById('customScen').innerHTML=s;
+  var chips=document.querySelectorAll('.scen .chip[data-scen]');for(var i=0;i<chips.length;i++){var c=chips[i];c.classList.toggle('active',c.getAttribute('data-scen')===SCEN);c.classList.toggle('dirty',DIRTY&&c.getAttribute('data-scen')===SCEN)}
+  var note=I18N[LANG].scen[SCEN]||(H.meta&&H.meta.name)||'';document.getElementById('scenNote').textContent=(DIRTY?(LANG==='fr'?'modifié · ':'edited · '):'')+note;}
+function renderAll(){
+  var A=M.annual,K=M.kpis,W=M.weeks; renderScenarioBar();
+  document.getElementById('kpis').innerHTML=
+    kpi('accent',T('k.rev'),fmt(A.revenue)+' <small>MAD</small>',T('k.revd')+fmt(K.revenueTTC)+' MAD')+
+    kpi('accent',T('k.ret'),fmt(A.revRetreat)+' <small>MAD</small>',K.retreats+' '+T('k.retd').split(' · ')[0]+' · '+K.pax+' '+T('k.retd').split(' · ')[1])+
+    kpi('vipc',T('k.vip'),fmt(A.revVip)+' <small>MAD</small>',K.vipDays+' '+T('k.vipd').split(' · ')[0]+' · '+M.derived.ventStays+' '+T('k.vipd').split(' · ')[1])+
+    kpi('costc',T('k.ebitda'),fmt(A.ebitda)+' <small>MAD</small>',T('k.ebitdad')+' '+pct(A.ebitdaMargin))+
+    kpi('cash',T('k.min'),'<span class="'+(K.minCash<H.calendar.minCashBuffer?'neg':'')+'">'+fmt(K.minCash)+'</span> <small>MAD</small>',T('k.mind')+' '+(K.minCashWeek||(LANG==='fr'?'0 (ouverture)':'0 (opening)')))+
+    kpi('cash',T('k.close'),fmt(K.closingCash)+' <small>MAD</small>',T('k.closed')+' '+fmt(H.calendar.openingCash)+' MAD')+
+    kpi('cash',T('k.below'),'<span class="'+(K.weeksBelowBuffer?'neg':'pos')+'">'+K.weeksBelowBuffer+'</span>',T('k.belowd')+' '+fmt(H.calendar.minCashBuffer)+' MAD')+
+    kpi('accent',T('k.bep'),K.breakEvenPax.toFixed(1),T('k.bepd'));
+  document.getElementById('cashChart').innerHTML=cashSVG(W);
+  document.getElementById('revChart').innerHTML=revSVG(W);
+  renderCapChips(A,K); renderCal(W); renderUnit(); renderHyp(); renderChecks(); renderRev(W); renderCost(A,K); renderCash(W); renderViz(A,K);
+}
+function renderCapChips(A,K){var X=H.financing;
+  document.getElementById('capChips').innerHTML='<div class="c">'+D('capDeployed')+' <b>'+fmt(X.capitalDeployed)+' MAD</b></div><div class="c">'+D('ebitdaYield')+' <b>'+pct(K.ebitdaYield)+'</b></div><div class="c">'+D('deprAsset')+' <b>'+fmt(K.depreciation)+' MAD</b>'+(X.useLegacyDepreciation?' <span style="color:var(--ink-3)">('+D('legacy')+')</span>':'')+'</div><div class="c'+(X.debtServiceIncluded?'':' warn')+'">'+D('debt')+' <b>CCA '+fmtK(X.ccaBalance)+' · '+D('loans')+' '+fmtK(M.derived.loanPrincipal)+'</b> — '+(X.debtServiceIncluded?D('debtOn')+' ('+fmt(A.financing)+' MAD)':D('debtOff'))+'</div>';}
+function cashSVG(W){
+  var w=760,h=260,pl=58,pr=10,pt=14,pb=28,n=W.length;
+  var maxC=0,maxF=0;for(var i=0;i<n;i++){maxC=Math.max(maxC,W[i].closing,W[i].opening);maxF=Math.max(maxF,W[i].inflows,W[i].outflows);}
+  var minC=Math.min(0,Math.min.apply(null,W.map(function(x){return x.closing})));
+  var top=Math.max(maxC,H.calendar.minCashBuffer)*1.08||1, bot=minC*1.1;
+  var y=function(v){return pt+(h-pt-pb)*(1-(v-bot)/(top-bot))}, x=function(i){return pl+(w-pl-pr)*(i+0.5)/n};
+  var s='<svg viewBox="0 0 '+w+' '+h+'" width="100%" role="img" aria-label="'+T('cashCurve')+'">';
+  for(var g=0;g<=4;g++){var v=bot+(top-bot)*g/4;s+='<line x1="'+pl+'" x2="'+(w-pr)+'" y1="'+y(v)+'" y2="'+y(v)+'" stroke="#EEE6D8"/><text x="'+(pl-6)+'" y="'+(y(v)+4)+'" font-size="10" text-anchor="end">'+fmtK(v)+'</text>';}
+  var bw=(w-pl-pr)/n*0.8, yf=function(v){return (h-pb)-(h-pt-pb)*0.42*(maxF?v/maxF:0)};
+  for(i=0;i<n;i++){s+='<rect x="'+(x(i)-bw/2)+'" y="'+yf(W[i].inflows)+'" width="'+(bw/2-1)+'" height="'+((h-pb)-yf(W[i].inflows))+'" fill="#B4552F" opacity=".35" rx="2"><title>S'+(i+1)+' '+T('l.in')+' '+fmt(W[i].inflows)+'</title></rect>';
+    s+='<rect x="'+(x(i)+1)+'" y="'+yf(W[i].outflows)+'" width="'+(bw/2-1)+'" height="'+((h-pb)-yf(W[i].outflows))+'" fill="#4a3aa7" opacity=".3" rx="2"><title>S'+(i+1)+' '+T('l.out')+' '+fmt(W[i].outflows)+'</title></rect>';}
+  s+='<line x1="'+pl+'" x2="'+(w-pr)+'" y1="'+y(H.calendar.minCashBuffer)+'" y2="'+y(H.calendar.minCashBuffer)+'" stroke="#B8860B" stroke-dasharray="5 4" stroke-width="1.5"/>';
+  var p='';for(i=0;i<n;i++)p+=(i?'L':'M')+x(i).toFixed(1)+' '+y(W[i].closing).toFixed(1);
+  s+='<path d="'+p+'" fill="none" stroke="#2B2622" stroke-width="2.2"/>';
+  for(i=0;i<n;i++)s+='<circle cx="'+x(i)+'" cy="'+y(W[i].closing)+'" r="6" fill="transparent"><title>S'+(i+1)+' · '+W[i].start+' · '+T('l.cash')+' '+fmt(W[i].closing)+'</title></circle>';
+  var mi=M.kpis.minCashWeek?M.kpis.minCashWeek-1:0;s+='<circle cx="'+x(mi)+'" cy="'+y(W[mi].closing)+'" r="5" fill="#fff" stroke="#B3261E" stroke-width="2"/>';
+  for(i=0;i<n;i+=4)s+='<text x="'+x(i)+'" y="'+(h-8)+'" font-size="10" text-anchor="middle">S'+(i+1)+'</text>';
+  return s+'</svg>';
+}
+function revSVG(W){
+  var mo=monthly(W),w=480,h=260,pl=50,pr=8,pt=14,pb=28,max=0;for(var i=0;i<12;i++)max=Math.max(max,mo[i].r+mo[i].v);max=max*1.1||1;
+  var y=function(v){return pt+(h-pt-pb)*(1-v/max)},bw=(w-pl-pr)/12*0.62,s='<svg viewBox="0 0 '+w+' '+h+'" width="100%" role="img" aria-label="'+T('revSplit')+'">';
+  for(var g=0;g<=4;g++){var v=max*g/4;s+='<line x1="'+pl+'" x2="'+(w-pr)+'" y1="'+y(v)+'" y2="'+y(v)+'" stroke="#EEE6D8"/><text x="'+(pl-6)+'" y="'+(y(v)+4)+'" font-size="10" text-anchor="end">'+fmtK(v)+'</text>';}
+  for(i=0;i<12;i++){var cx=pl+(w-pl-pr)*(i+0.5)/12;
+    s+='<rect x="'+(cx-bw/2)+'" y="'+y(mo[i].r)+'" width="'+bw+'" height="'+(y(0)-y(mo[i].r))+'" fill="#B4552F" rx="3"><title>'+MONTHS[LANG][i]+' '+T('l.ret')+' '+fmt(mo[i].r)+'</title></rect>';
+    if(mo[i].v>0)s+='<rect x="'+(cx-bw/2)+'" y="'+(y(mo[i].r+mo[i].v))+'" width="'+bw+'" height="'+Math.max(0,y(mo[i].r)-y(mo[i].r+mo[i].v)-2)+'" fill="#2a78d6" rx="3"><title>'+MONTHS[LANG][i]+' VIP '+fmt(mo[i].v)+'</title></rect>';
+    s+='<text x="'+cx+'" y="'+(h-8)+'" font-size="10" text-anchor="middle">'+MONTHS[LANG][i]+'</text><text x="'+cx+'" y="'+(y(mo[i].r+mo[i].v)-5)+'" font-size="10" text-anchor="middle">'+fmtK(mo[i].r+mo[i].v)+'</text>';}
+  return s+'</svg>';
+}
+function renderCal(W){var s='';for(var i=0;i<W.length;i++){var c=W[i].retreatCount&&W[i].vipDays?'rv':W[i].retreatCount?'r':W[i].vipDays?'v':'';var t='S'+W[i].idx+' · '+W[i].start+(W[i].retreatCount?' · '+T('act.r')+' ('+W[i].retreatPax+')':'')+(W[i].vipDays?' · VIP '+W[i].vipDays+'j':'');s+='<div class="'+c+'" data-t="'+t+'"></div>';}document.getElementById('cal').innerHTML=s;}
+function renderUnit(){var K=M.kpis,R=H.retreats,cPax=K.contribPerPax,cVip=K.contribPerVipDay;
+  document.getElementById('unitTbl').innerHTML='<table><tr><th>'+T('u.item')+'</th><th class="n">'+T('u.pax')+'</th><th class="n">'+T('u.ret')+'</th><th class="n">'+T('u.vipd')+'</th></tr>'+
+  '<tr><td>'+T('u.priceHT')+'</td><td class="n">'+fmt(K.priceHT)+'</td><td class="n">'+fmt(K.priceHT*R.participants)+'</td><td class="n">'+fmt(K.vipRateHT)+'</td></tr>'+
+  '<tr><td>'+T('u.comm')+'</td><td class="n neg">−'+fmt(R.priceTTC*K.retreatCommRate)+'</td><td class="n neg">−'+fmt(R.priceTTC*K.retreatCommRate*R.participants)+'</td><td class="n neg">−'+fmt(K.vipRateTTC*K.vipCommRate)+'</td></tr>'+
+  '<tr><td>'+T('u.varc')+'</td><td class="n neg">−'+fmt(K.varPerPax)+'</td><td class="n neg">−'+fmt(K.varPerPax*R.participants+K.varRetreatFixed)+'</td><td class="n neg">−'+fmt(K.vipVarPerDay)+'</td></tr>'+
+  '<tr class="total"><td>'+T('u.contrib')+'</td><td class="n">'+fmt(cPax)+'</td><td class="n">'+fmt(K.contribPerRetreat)+'</td><td class="n">'+fmt(cVip)+'</td></tr>'+
+  '<tr><td>'+T('u.pct')+'</td><td class="n">'+pct(K.priceHT?cPax/K.priceHT:0)+'</td><td class="n">'+pct(K.priceHT?K.contribPerRetreat/(K.priceHT*R.participants):0)+'</td><td class="n">'+pct(K.vipRateHT?cVip/K.vipRateHT:0)+'</td></tr></table>';}
+/* ---------- Hypotheses editor ---------- */
+function inp(path,key,opts){opts=opts||{};var v=getPath(H,path);var type=opts.type||'number';var val=type==='pct'?Math.round(v*10000)/100:v;
+  return '<input type="'+(type==='date'?'date':type==='text'?'text':'number')+'" '+(type==='pct'?'step="0.1" min="0" ':type==='int'?'step="1" min="0" ':type==='number'?'step="any" ':'')+'class="'+(opts.cls||'')+'" data-path="'+path+'" data-type="'+type+'" value="'+esc(val)+'">'+(opts.unit?'<span class="unit">'+opts.unit+'</span>':'')+(key?'<span class="key">'+key+'</span>':'')}
+function hrow(l,v){return '<tr><td style="width:52%">'+l+'</td><td class="n">'+v+'</td></tr>'}
+function grid(path,keyBase){var a=getPath(H,path),s='';for(var i=0;i<12;i++)s+='<input type="number" step="1" min="0" class="g" data-path="'+path+'.'+i+'" data-type="int" title="'+MONTHS[LANG][i]+'" value="'+a[i]+'">';return s+'<span class="key">'+keyBase+'_1…12</span>'}
+function renderHyp(){var R=H.retreats,V=H.vip,P=H.payroll,F=H.fixed,c=H.calendar,X=H.financing,Dd=M.derived,i;
+  function sub(group,keyPrefix,unit){var o=getPath(H,group),s='';for(var k in o)if(o.hasOwnProperty(k))s+=hrow(D(k)+(k.indexOf('mk_')===0?'':''),inp(group+'.'+k,keyPrefix+'_'+k,{unit:unit}));return s}
+  function subMk(){var s='';for(var k in F.marketingAnnual)s+=hrow(D('mk_'+k),inp('fixed.marketingAnnual.'+k,'fixed_marketingAnnual_'+k,{unit:'MAD'}));return s}
+  function tbl(headers,rows){return '<table class="small-tbl"><tr>'+headers.map(function(h){return '<th>'+h+'</th>'}).join('')+'</tr>'+rows.map(function(r){return '<tr>'+r.map(function(cell,j){return '<td'+(j?' class="n"':'')+'>'+cell+'</td>'}).join('')+'</tr>'}).join('')+'</table>'}
+  var cards=[
+   [T('h.cal'),hrow(T('h.start'),inp('calendar.startDate','calendar_startDate',{type:'date',cls:'w'}))+hrow(T('h.weeks'),inp('calendar.weeks','calendar_weeks',{type:'int'}))+hrow(T('h.open'),inp('calendar.openingCash','calendar_openingCash',{unit:'MAD'}))+hrow(T('h.buf'),inp('calendar.minCashBuffer','calendar_minCashBuffer',{unit:'MAD'}))],
+   [T('h.ret'),hrow(T('h.pm'),grid('retreats.perMonth','retreats_perMonth'))+hrow(T('h.pax'),inp('retreats.participants','retreats_participants',{type:'int'}))+hrow(T('h.cap'),inp('retreats.capacity','retreats_capacity',{type:'int'}))+hrow(T('h.nights'),inp('retreats.nights','retreats_nights',{type:'int'}))+hrow(T('h.price'),inp('retreats.priceTTC','retreats_priceTTC',{unit:'MAD'}))+hrow(T('h.vat'),inp('retreats.vatRate','retreats_vatRate',{type:'pct',unit:'%'}))+hrow(T('h.disc'),inp('retreats.avgDiscount','retreats_avgDiscount',{type:'pct',unit:'%'}))+hrow(T('h.dep'),inp('retreats.depositPct','retreats_depositPct',{type:'pct',unit:'%'}))+hrow(T('h.depl'),inp('retreats.depositLeadWeeks','retreats_depositLeadWeeks',{type:'int'}))+hrow(T('h.ball'),inp('retreats.balanceLeadWeeks','retreats_balanceLeadWeeks',{type:'int'}))+
+     hrow(T('h.chd'),inp('retreats.channels.direct','retreats_channels_direct',{type:'pct',unit:'%'}))+hrow(T('h.chw'),inp('retreats.channels.whatsapp','retreats_channels_whatsapp',{type:'pct',unit:'%'}))+hrow(T('h.chp'),inp('retreats.channels.platforms','retreats_channels_platforms',{type:'pct',unit:'%'}))+hrow(T('h.cha'),inp('retreats.channels.agents','retreats_channels_agents',{type:'pct',unit:'%'}))+hrow(T('h.pc'),inp('retreats.platformCommission','retreats_platformCommission',{type:'pct',unit:'%'}))+hrow(T('h.ac'),inp('retreats.agentCommission','retreats_agentCommission',{type:'pct',unit:'%'}))+hrow(T('h.cf'),inp('retreats.cardFee','retreats_cardFee',{type:'pct',unit:'%'}))+hrow(T('h.cs'),inp('retreats.cardShare','retreats_cardShare',{type:'pct',unit:'%'}))+
+     hrow(T('h.yoga'),inp('retreats.varPerRetreat.yogaTeacher','retreats_varPerRetreat_yogaTeacher',{unit:'MAD'}))+hrow(T('h.sound'),inp('retreats.varPerRetreat.soundHealer','retreats_varPerRetreat_soundHealer',{unit:'MAD'}))+hrow(T('h.tr'),inp('retreats.varPerRetreat.transfers','retreats_varPerRetreat_transfers',{unit:'MAD'}))+hrow(T('h.la'),inp('retreats.varPerRetreat.laundry','retreats_varPerRetreat_laundry',{unit:'MAD'}))+hrow(T('h.ph'),inp('retreats.varPerRetreat.photo','retreats_varPerRetreat_photo',{unit:'MAD'}))+hrow(T('h.mi'),inp('retreats.varPerRetreat.misc','retreats_varPerRetreat_misc',{unit:'MAD'}))+hrow(T('h.fb'),inp('retreats.varPerPax.fbPerDay','retreats_varPerPax_fbPerDay',{unit:'MAD'}))+hrow(T('h.spa'),inp('retreats.varPerPax.spa','retreats_varPerPax_spa',{unit:'MAD'}))+hrow(T('h.kit'),inp('retreats.varPerPax.welcomeKit','retreats_varPerPax_welcomeKit',{unit:'MAD'}))+
+     '<tr><td colspan="2" class="derived">'+T('h.derived')+' : '+T('u.priceHT')+' '+fmt(Dd.priceHT)+' · '+D('comm')+' '+pct(Dd.retreatCommRate)+' · '+D('varc')+' '+fmt(Dd.varPerPax)+' / pax + '+fmt(Dd.varRetreatFixed)+' / '+D('retreat').toLowerCase()+'</td></tr>'],
+   [T('h.vip'),hrow(T('h.vd'),grid('vip.daysPerMonth','vip_daysPerMonth'))+hrow(T('h.vat'),inp('vip.vatRate','vip_vatRate',{type:'pct',unit:'%'}))+hrow(T('h.ms'),inp('vip.minStayDays','vip_minStayDays',{type:'int'}))+hrow(T('h.ag'),inp('vip.avgGuests','vip_avgGuests',{type:'int'}))+hrow(T('h.dep'),inp('vip.depositPct','vip_depositPct',{type:'pct',unit:'%'}))+hrow(T('h.depl'),inp('vip.depositLeadWeeks','vip_depositLeadWeeks',{type:'int'}))+hrow(T('h.ball'),inp('vip.balanceLeadWeeks','vip_balanceLeadWeeks',{type:'int'}))+hrow(T('h.cf'),inp('vip.cardFee','vip_cardFee',{type:'pct',unit:'%'}))+hrow(T('h.cs'),inp('vip.cardShare','vip_cardShare',{type:'pct',unit:'%'}))+
+     hrow(T('h.vfb'),inp('vip.varPerDay.fb','vip_varPerDay_fb',{unit:'MAD'}))+hrow(T('h.vst'),inp('vip.varPerDay.extraStaff','vip_varPerDay_extraStaff',{unit:'MAD'}))+hrow(T('h.vdr'),inp('vip.varPerDay.driverFuel','vip_varPerDay_driverFuel',{unit:'MAD'}))+hrow(T('h.vna'),inp('vip.varPerDay.nautical','vip_varPerDay_nautical',{unit:'MAD'}))+hrow(T('h.vla'),inp('vip.varPerDay.laundry','vip_varPerDay_laundry',{unit:'MAD'}))+hrow(T('h.vex'),inp('vip.varPerDay.experiences','vip_varPerDay_experiences',{unit:'MAD'}))+hrow(T('h.vam'),inp('vip.varPerDay.amenities','vip_varPerDay_amenities',{unit:'MAD'}))+
+     '<tr><td colspan="2" class="derived">'+T('h.derived')+' : '+D('blended')+' '+fmt(Dd.vipRateTTC)+' TTC · '+D('comm')+' '+pct(Dd.vipCommRate)+' · '+D('varc')+' '+fmt(Dd.vipVarPerDay)+' / '+D('days').replace(/s$/,'')+'</td></tr>'],
+   [T('h.vent'),'<tr><td colspan="2">'+tbl([D('byStay'),T('h.stays'),T('h.nightsC'),T('h.rate')],V.ventilation.stayTypes.map(function(s,j){return [D('st_'+s.key),inp('vip.ventilation.stayTypes.'+j+'.stays','vip_stayTypes_stays_'+(j+1),{type:'int'}),inp('vip.ventilation.stayTypes.'+j+'.nights','vip_stayTypes_nights_'+(j+1),{type:'int'}),inp('vip.ventilation.stayTypes.'+j+'.rateTTC','vip_stayTypes_rateTTC_'+(j+1),{unit:'MAD'})]}))+'<div class="derived" style="margin:6px 0">'+D('consistency')+' : '+Dd.ventDays+' / '+Dd.gridDays+' '+(M.checks.ventilationOk?'✓':'⚠')+'</div>'+
+     tbl([D('bySegment'),T('h.share')],V.ventilation.segments.map(function(s,j){return [D('sg_'+s.key),inp('vip.ventilation.segments.'+j+'.share','vip_segments_share_'+(j+1),{type:'pct',unit:'%'})]}))+'<div style="height:8px"></div>'+
+     tbl([D('byChannel'),T('h.share'),T('h.commission')],V.ventilation.channels.map(function(s,j){return [D('ch_'+s.key),inp('vip.ventilation.channels.'+j+'.share','vip_channels_share_'+(j+1),{type:'pct',unit:'%'}),inp('vip.ventilation.channels.'+j+'.commission','vip_channels_commission_'+(j+1),{type:'pct',unit:'%'})]}))+'</td></tr>'],
+   [T('h.pay'),hrow(T('h.er'),inp('payroll.employerRate','payroll_employerRate',{type:'pct',unit:'%'}))+'<tr><td colspan="2">'+tbl([T('h.perm'),T('h.n'),T('h.gross')],P.permanent.map(function(r,j){return [esc(r.role),inp('payroll.permanent.'+j+'.n','payroll_permanent_n_'+(j+1),{type:'int'}),inp('payroll.permanent.'+j+'.gross','payroll_permanent_gross_'+(j+1),{unit:'MAD'})]}))+'<div style="height:8px"></div>'+tbl([T('h.seas'),T('h.n'),T('h.gross'),T('h.from'),T('h.to')],P.seasonal.map(function(r,j){return [esc(r.role),inp('payroll.seasonal.'+j+'.n','payroll_seasonal_n_'+(j+1),{type:'int'}),inp('payroll.seasonal.'+j+'.gross','payroll_seasonal_gross_'+(j+1),{unit:'MAD'}),inp('payroll.seasonal.'+j+'.fromMonth','payroll_seasonal_fromMonth_'+(j+1),{type:'int'}),inp('payroll.seasonal.'+j+'.toMonth','payroll_seasonal_toMonth_'+(j+1),{type:'int'})]}))+'</td></tr>'+'<tr><td colspan="2" class="derived">'+T('h.derived')+' : '+fmt(M.annual.payroll)+' MAD / '+(LANG==='fr'?'an chargé':'yr loaded')+'</td></tr>'],
+   [T('h.fix'),'<tr class="sec costsec"><td colspan="2">'+T('h.util')+' — '+fmt(Dd.utilitiesMonthly)+'</td></tr>'+sub('fixed.utilitiesMonthly','fixed_utilitiesMonthly','MAD')+'<tr class="sec costsec"><td colspan="2">'+T('h.sup')+' — '+fmt(Dd.suppliesMonthly)+'</td></tr>'+sub('fixed.suppliesMonthly','fixed_suppliesMonthly','MAD')+'<tr class="sec costsec"><td colspan="2">'+T('h.mai')+' — '+fmt(Dd.maintenanceMonthly)+'</td></tr>'+sub('fixed.maintenanceMonthly','fixed_maintenanceMonthly','MAD')+'<tr class="sec costsec"><td colspan="2">'+T('h.mk')+' — '+fmt(Dd.marketingAnnual)+'</td></tr>'+subMk()+hrow(T('h.fl'),inp('fixed.marketingFrontLoad','fixed_marketingFrontLoad',{}))+'<tr class="sec costsec"><td colspan="2">'+T('h.ins')+' — '+fmt(Dd.insuranceAnnual)+'</td></tr>'+sub('fixed.insuranceAnnual','fixed_insuranceAnnual','MAD')+hrow(T('h.insw'),inp('fixed.insuranceWeek','fixed_insuranceWeek',{type:'int'}))+'<tr class="sec costsec"><td colspan="2">'+T('h.adm')+' — '+fmt(Dd.adminMonthly)+'</td></tr>'+sub('fixed.adminMonthly','fixed_adminMonthly','MAD')+'<tr class="sec costsec"><td colspan="2">'+T('h.tx')+' — '+fmt(Dd.taxesAnnual)+'</td></tr>'+sub('fixed.taxesAnnual','fixed_taxesAnnual','MAD')+hrow(T('h.txw'),inp('fixed.taxesWeek','fixed_taxesWeek',{type:'int'}))+hrow(T('h.tt'),inp('fixed.touristTaxPerPersonNight','fixed_touristTaxPerPersonNight',{unit:'MAD'}))+hrow(T('h.rent'),inp('fixed.intraGroupRentMonthly','fixed_intraGroupRentMonthly',{unit:'MAD'}))],
+   [T('h.tax')+' · '+T('h.fin'),hrow(T('h.ivat'),inp('tax.inputVatRecoverable','tax_inputVatRecoverable',{type:'pct',unit:'%'}))+hrow(T('h.is'),inp('tax.isRate','tax_isRate',{type:'pct',unit:'%'}))+
+     hrow(T('h.debt'),'<label class="sw"><input type="checkbox" data-path="financing.debtServiceIncluded" data-type="bool" '+(X.debtServiceIncluded?'checked':'')+'> '+(X.debtServiceIncluded?'ON':'OFF')+'</label><span class="key">financing_debtServiceIncluded</span>')+hrow(T('h.cca'),inp('financing.ccaBalance','financing_ccaBalance',{unit:'MAD'}))+hrow(T('h.ccar'),inp('financing.ccaRate','financing_ccaRate',{type:'pct',unit:'%'}))+
+     '<tr><td colspan="2">'+tbl([T('h.lender'),T('h.principal'),T('h.lrate'),T('h.years')],X.loans.map(function(l,j){return [esc(l.lender),inp('financing.loans.'+j+'.principal','financing_loans_principal_'+(j+1),{unit:'MAD'}),inp('financing.loans.'+j+'.rate','financing_loans_rate_'+(j+1),{type:'pct',unit:'%'}),inp('financing.loans.'+j+'.years','financing_loans_years_'+(j+1),{type:'int'})]}))+'</td></tr>'+
+     hrow(T('h.legacy'),'<label class="sw"><input type="checkbox" data-path="financing.useLegacyDepreciation" data-type="bool" '+(X.useLegacyDepreciation?'checked':'')+'> '+(X.useLegacyDepreciation?'ON':'OFF')+'</label><span class="key">financing_useLegacyDepreciation</span>')+hrow(T('h.legacyAmt'),inp('financing.depreciationLegacy','financing_depreciationLegacy',{unit:'MAD'}))+
+     '<tr><td colspan="2">'+tbl([T('h.asset'),T('h.base'),T('h.drate')],X.depreciation.map(function(a,j){return [esc(a.asset),inp('financing.depreciation.'+j+'.base','financing_depreciation_base_'+(j+1),{unit:'MAD'}),inp('financing.depreciation.'+j+'.rate','financing_depreciation_rate_'+(j+1),{type:'pct',unit:'%'})]}))+'</td></tr>'+hrow(T('h.cap2'),inp('financing.capitalDeployed','financing_capitalDeployed',{unit:'MAD'}))+
+     '<tr><td colspan="2" class="derived">'+T('h.derived')+' : '+D('deprAsset')+' '+fmt(Dd.depreciationAnnual)+' MAD · '+(LANG==='fr'?'annuités':'annuities')+' '+fmt(Dd.loanAnnuityMonthly)+' MAD / '+(LANG==='fr'?'mois':'month')+'</td></tr>'],
+   [T('h.integ'),hrow(T('h.endpoint'),inp('integration.endpoint','',{type:'text',cls:'w'}))+'<tr><td colspan="2" class="derived">'+(LANG==='fr'?'Sans URL, l\'application fonctionne hors ligne ; les hypothèses sont sauvegardées dans ce navigateur et échangées avec le modèle Google Sheets par CSV (bouton « Hypothèses → Sheet »). Avec une URL Apps Script (§3.5 du build-prompt), les hypothèses et les transactions réelles seront synchronisées automatiquement.':'Without a URL the app works offline; assumptions are saved in this browser and exchanged with the Google Sheets model by CSV (“Assumptions → Sheet” button). With an Apps Script URL (build-prompt §3.5), assumptions and actual bank transactions will sync automatically.')+'</td></tr>']
+  ];
+  document.getElementById('hypGrid').innerHTML=cards.map(function(c){return '<div class="card hyp"><h3>'+c[0]+'</h3><table>'+c[1]+'</table></div>'}).join('');
+}
+function renderChecks(){var C=M.checks,L=I18N[LANG].chk,items=[];
+  if(!C.ventilationOk)items.push(L.vent.replace('{a}',M.derived.ventDays).replace('{b}',M.derived.gridDays));
+  if(!C.channelsOk)items.push(L.ch);if(!C.segmentsOk)items.push(L.sg);if(!C.retreatChannelsOk)items.push(L.rch);if(!C.capacityOk)items.push(L.cap);
+  C.conflicts.forEach(function(c){items.push(L.conf.replace('{m}',MONTHS[LANG][c.month%12]).replace('{a}',c.requested).replace('{b}',c.placed))});
+  document.getElementById('checks').innerHTML=items.length?items.map(function(t){return '<div class="check bad">⚠ '+t+'</div>'}).join(''):'<div class="check ok">✓ '+L.ok+'</div>';}
+/* ---------- cost hierarchy & Charges tab ---------- */
+var COSTFAM='all', COSTTAG={r:true,v:true,c:true}, COSTVIEW='annual', COSTQ='', COSTOPEN={}, REVSEL='all', REVOPEN={}, CASHF='all';
+function L2(label,amt,drv){return {label:label,amt:amt,drv:drv}}
+function costTree(A,K){var R=H.retreats,V=H.vip,P=H.payroll,F=H.fixed,Dd=M.derived,n=K.retreats,px=K.pax,vd=K.vipDays,ttcR=A.revRetreat*(1+R.vatRate),ttcV=A.revVip*(1+V.vatRate);
+  function objItems(o,prefix,mult,drvUnit){var arr=[];for(var k in o)if(o.hasOwnProperty(k))arr.push(L2(D(prefix+k),o[k]*mult,fmt(o[k])+' × '+drvUnit));return arr}
+  return [
+   {k:'rv',fam:'var',tag:'r',amt:A.varRetreat,unit:n?A.varRetreat/n:0,unitL:D('perRetreat'),items:[
+     L2(D('facil'),(R.varPerRetreat.yogaTeacher+R.varPerRetreat.soundHealer)*n,n+' × '+fmt(R.varPerRetreat.yogaTeacher+R.varPerRetreat.soundHealer)),
+     L2(D('fb'),px*R.nights*R.varPerPax.fbPerDay,px+' pax × '+R.nights+' j × '+fmt(R.varPerPax.fbPerDay)),
+     L2(D('spa'),px*R.varPerPax.spa,px+' × '+fmt(R.varPerPax.spa)),L2(D('kit'),px*R.varPerPax.welcomeKit,px+' × '+fmt(R.varPerPax.welcomeKit)),
+     L2(D('transfers'),n*R.varPerRetreat.transfers,n+' × '+fmt(R.varPerRetreat.transfers)),L2(D('laundry'),n*R.varPerRetreat.laundry,n+' × '+fmt(R.varPerRetreat.laundry)),
+     L2(D('photo'),n*R.varPerRetreat.photo,n+' × '+fmt(R.varPerRetreat.photo)),L2(D('misc'),n*R.varPerRetreat.misc,n+' × '+fmt(R.varPerRetreat.misc))]},
+   {k:'rc',fam:'var',tag:'r',amt:A.commRetreat,unit:n?A.commRetreat/n:0,unitL:D('perRetreat'),items:[
+     L2(D('platforms'),ttcR*R.channels.platforms*R.platformCommission,pct(R.channels.platforms)+' × '+pct(R.platformCommission)),
+     L2(D('agents'),ttcR*R.channels.agents*R.agentCommission,pct(R.channels.agents)+' × '+pct(R.agentCommission)),
+     L2(D('card'),ttcR*R.cardShare*R.cardFee,pct(R.cardShare)+' × '+pct(R.cardFee))]},
+   {k:'vv',fam:'var',tag:'v',amt:A.varVip,unit:vd?A.varVip/vd:0,unitL:D('perVipDay'),items:[
+     L2('F&B',vd*V.varPerDay.fb,vd+' j × '+fmt(V.varPerDay.fb)),L2(D('extraStaff'),vd*V.varPerDay.extraStaff,vd+' j × '+fmt(V.varPerDay.extraStaff)),
+     L2(D('driver'),vd*V.varPerDay.driverFuel,vd+' j × '+fmt(V.varPerDay.driverFuel)),L2('Jetski & RIB',vd*V.varPerDay.nautical,vd+' j × '+fmt(V.varPerDay.nautical)),
+     L2(D('laundry'),vd*V.varPerDay.laundry,vd+' j × '+fmt(V.varPerDay.laundry)),L2(D('experiences'),vd*V.varPerDay.experiences,vd+' j × '+fmt(V.varPerDay.experiences)),
+     L2('Amenities',vd*V.varPerDay.amenities,vd+' j × '+fmt(V.varPerDay.amenities))]},
+   {k:'vc',fam:'var',tag:'v',amt:A.commVip,unit:vd?A.commVip/vd:0,unitL:D('perVipDay'),items:V.ventilation.channels.map(function(c){return L2(D('ch_'+c.key),ttcV*c.share*c.commission,pct(c.share)+' × '+pct(c.commission))}).concat([L2(D('card'),ttcV*V.cardShare*V.cardFee,pct(V.cardShare)+' × '+pct(V.cardFee))])},
+   {k:'pay',fam:'fix',tag:'c',amt:A.payroll,items:P.permanent.map(function(r){return L2(esc(r.role),r.n*r.gross*(1+P.employerRate)*12,r.n+' × '+fmt(r.gross)+' × '+(1+P.employerRate).toFixed(2)+' × 12')}).concat(P.seasonal.map(function(r){var mo=Math.max(0,r.toMonth-r.fromMonth+1);return L2(esc(r.role),r.n*r.gross*(1+P.employerRate)*mo,r.n+' × '+fmt(r.gross)+' × '+(1+P.employerRate).toFixed(2)+' × '+mo)}))},
+   {k:'ut',fam:'fix',tag:'c',amt:A.utilities,items:objItems(F.utilitiesMonthly,'',12,'12')},
+   {k:'su',fam:'fix',tag:'c',amt:A.supplies,items:objItems(F.suppliesMonthly,'',12,'12')},
+   {k:'ma',fam:'fix',tag:'c',amt:A.maintenance,items:objItems(F.maintenanceMonthly,'',12,'12')},
+   {k:'mk',fam:'fix',tag:'c',amt:A.marketing,items:objItems(F.marketingAnnual,'mk_',1,'1')},
+   {k:'ins',fam:'fix',tag:'c',amt:A.insurance,items:objItems(F.insuranceAnnual,'',1,'1')},
+   {k:'ad',fam:'fix',tag:'c',amt:A.admin,items:objItems(F.adminMonthly,'',12,'12')},
+   {k:'tx',fam:'fix',tag:'c',amt:A.taxes,items:objItems(F.taxesAnnual,'',1,'1')},
+   {k:'tt',fam:'fix',tag:'c',amt:A.touristTax,items:[L2(T('l.ret'),px*R.nights*F.touristTaxPerPersonNight,px+' × '+R.nights+' × '+F.touristTaxPerPersonNight),L2('VIP',vd*V.avgGuests*F.touristTaxPerPersonNight,vd+' × '+V.avgGuests+' × '+F.touristTaxPerPersonNight)]},
+   {k:'rent',fam:'fix',tag:'c',amt:A.rent,items:[L2(D('rentLine'),A.rent,fmt(F.intraGroupRentMonthly)+' × 12')]},
+   {k:'fin',fam:'fix',tag:'c',amt:A.financing,items:[L2('CCA',H.financing.debtServiceIncluded?H.financing.ccaBalance*H.financing.ccaRate:0,fmt(H.financing.ccaBalance)+' × '+pct(H.financing.ccaRate)),L2(D('loans'),H.financing.debtServiceIncluded?Dd.loanAnnuityMonthly*12:0,fmt(Dd.loanAnnuityMonthly)+' × 12')]}
+  ];}
+function costLabel(k){var lbl=LANG==='fr'?{rv:'Coûts variables retraites',rc:'Commissions & frais retraites',vv:'Coûts variables VIP',vc:'Commissions VIP',pay:'Masse salariale chargée',ut:'Utilities',su:'Fournitures',ma:'Maintenance & réparations',mk:'Marketing',ins:'Assurances',ad:'Honoraires & admin',tx:'Patente & taxes',tt:'Taxe de séjour',rent:'Loyer intra-groupe',fin:'Service de la dette'}:{rv:'Retreat variable costs',rc:'Retreat commissions & fees',vv:'VIP variable costs',vc:'VIP commissions',pay:'Loaded payroll',ut:'Utilities',su:'Supplies',ma:'Maintenance & repairs',mk:'Marketing',ins:'Insurance',ad:'Fees & admin',tx:'Business & local taxes',tt:'Tourist tax',rent:'Intra-group rent',fin:'Debt service'};return lbl[k]}
+function costVal(node,amt){if(COSTVIEW==='monthly')return amt/12;if(COSTVIEW==='unit'){if(node.unit!==undefined)return amt/(node.amt||1)*node.unit;return amt/12}return amt}
+function renderCost(A,K){var W=M.weeks,tree=costTree(A,K),varT=A.varRetreat+A.commRetreat+A.varVip+A.commVip,fixT=A.fixedTotal+A.financing,tot=varT+fixT,i,j;
+  document.getElementById('costKpis').innerHTML=tile('costc',D('c.cv'),fmt(varT)+' <small>MAD</small>',pct(A.revenue?varT/A.revenue:0)+' '+D('ofRev'),'var',COSTFAM==='var')+tile('costc',D('c.cf'),fmt(fixT)+' <small>MAD</small>',pct(A.revenue?fixT/A.revenue:0)+' '+D('ofRev'),'fix',COSTFAM==='fix')+kpi('accent','EBITDA',fmt(A.ebitda)+' <small>MAD</small>',pct(A.ebitdaMargin));
+  var mc=monthlyCosts(W),pan='';
+  if(COSTFAM==='var'){pan='<div class="panel violet"><button class="close" data-tile="var">✕</button><h4>'+D('c.cv')+' — '+D('detail')+'</h4><div class="pgrid"><div><table class="small-tbl"><tr><th>'+D('perRetreat')+'</th><th class="n">MAD</th></tr><tr><td>'+D('varc')+'</td><td class="n">'+fmt(K.varPerPax*H.retreats.participants+K.varRetreatFixed)+'</td></tr><tr><td>'+D('comm')+'</td><td class="n">'+fmt(H.retreats.priceTTC*K.retreatCommRate*H.retreats.participants)+'</td></tr><tr class="total"><td>'+D('contrib')+'</td><td class="n">'+fmt(K.contribPerRetreat)+'</td></tr></table></div><div><table class="small-tbl"><tr><th>'+D('perVipDay')+'</th><th class="n">MAD</th></tr><tr><td>'+D('varc')+'</td><td class="n">'+fmt(K.vipVarPerDay)+'</td></tr><tr><td>'+D('comm')+'</td><td class="n">'+fmt(K.vipRateTTC*K.vipCommRate)+'</td></tr><tr class="total"><td>'+D('contrib')+'</td><td class="n">'+fmt(K.contribPerVipDay)+'</td></tr></table></div><div><div class="sub">'+D('monthlyProfile')+' · '+D('splitRV')+' '+pct(varT?(A.varRetreat+A.commRetreat)/varT:0)+' / '+pct(varT?(A.varVip+A.commVip)/varT:0)+'</div>'+miniBars(mc.v,'')+'</div></div></div>';}
+  if(COSTFAM==='fix'){var cover=fixT?(A.contribRetreat+A.contribVip)/fixT:0;pan='<div class="panel violet"><button class="close" data-tile="fix">✕</button><h4>'+D('c.cf')+' — '+D('detail')+'</h4><div class="pgrid"><div><table class="small-tbl"><tr><th>'+D('composition')+'</th><th class="n">MAD</th><th class="n">%</th></tr>'+tree.filter(function(n){return n.fam==='fix'&&n.amt>0}).sort(function(a,b){return b.amt-a.amt}).map(function(n){return '<tr><td>'+costLabel(n.k)+'</td><td class="n">'+fmt(n.amt)+'</td><td class="n">'+pct(fixT?n.amt/fixT:0)+'</td></tr>'}).join('')+'</table></div><div><div class="sub">'+D('monthlyProfile')+' · '+D('insSpike')+'</div>'+miniBars(mc.f,'')+'</div><div><div class="kpi"><div class="lbl">'+D('coverage')+'</div><div class="val">'+cover.toFixed(2)+'×</div><div class="delta">'+D('coverageSub')+'</div></div><div class="kpi" style="margin-top:10px"><div class="lbl">'+T('k.bep')+'</div><div class="val">'+K.breakEvenPax.toFixed(1)+'</div><div class="delta">'+T('k.bepd')+'</div></div></div></div></div>';}
+  document.getElementById('costPanel').innerHTML=pan;
+  var q=COSTQ.toLowerCase(),rows='',shown=[],sumShown=0;
+  var vh=COSTVIEW==='annual'?T('f.annual'):COSTVIEW==='monthly'?T('f.monthly'):T('f.unit');
+  var s='<table><tr><th>'+T('u.item')+'</th><th class="n">MAD · '+vh+'</th><th class="n">%</th></tr>';
+  function fam(f){return f==='var'?'<tr class="sec"><td colspan="3">'+D('c.cv')+'</td></tr>':'<tr class="sec costsec"><td colspan="3">'+D('c.cf')+'</td></tr>'}
+  var lastFam='';
+  for(i=0;i<tree.length;i++){var n=tree[i];if(COSTFAM!=='all'&&n.fam!==COSTFAM)continue;if(!COSTTAG[n.tag])continue;if(n.k==='fin'&&!H.financing.debtServiceIncluded)continue;
+    var items=n.items.filter(function(it){return !q||it.label.toLowerCase().indexOf(q)>=0||costLabel(n.k).toLowerCase().indexOf(q)>=0});
+    if(q&&!items.length)continue;
+    if(n.fam!==lastFam){rows+=fam(n.fam);lastFam=n.fam}
+    var open=!!COSTOPEN[n.k];shown.push(n);sumShown+=n.amt;
+    rows+='<tr class="l1" data-k="'+n.k+'"><td><span class="xp'+(open?' open':'')+'">'+(open?'−':'+')+'</span>'+costLabel(n.k)+'<span class="tag '+(n.tag==='c'?'':n.tag)+'">'+(n.tag==='r'?T('act.r'):n.tag==='v'?'VIP':T('f.common'))+'</span>'+(COSTVIEW==='unit'&&n.unitL?'<span class="drv" style="color:var(--ink-3);font-size:11px;margin-left:8px">'+n.unitL+'</span>':'')+'</td><td class="n">'+fmt(costVal(n,n.amt))+'</td><td class="n">'+pct(tot?n.amt/tot:0)+'</td></tr>';
+    if(open)for(j=0;j<items.length;j++){var it=items[j];rows+='<tr class="l2"><td>'+it.label+'<span class="drv">'+it.drv+'</span></td><td class="n">'+fmt(costVal(n,it.amt))+'</td><td class="n">'+pct(tot?it.amt/tot:0)+'</td></tr>'}}
+  var totLbl=COSTFAM==='var'?D('c.cv'):COSTFAM==='fix'?D('c.cf'):D('totalCosts');
+  s+=rows+'<tr class="total"><td>'+totLbl+(shown.length<tree.length?' <span class="tag">'+D('filtered')+'</span>':'')+'</td><td class="n">'+fmt(COSTVIEW==='annual'?sumShown:sumShown/12)+'</td><td class="n">'+pct(tot?sumShown/tot:0)+' · '+pct(A.revenue?sumShown/A.revenue:0)+' '+D('ofRev')+'</td></tr></table>';
+  document.getElementById('costTable').innerHTML=s;
+  var sorted=shown.filter(function(n){return n.amt>0}).sort(function(a,b){return b.amt-a.amt}),w=420,rh=24,svg='<svg viewBox="0 0 '+w+' '+(Math.max(1,sorted.length)*rh+6)+'" width="100%">',mx=sorted.length?sorted[0].amt:1;
+  sorted.forEach(function(n,i){var bw=(w-250)*n.amt/mx,y=i*rh+3,col=n.tag==='r'?'#B4552F':n.tag==='v'?'#2a78d6':'#4a3aa7';svg+='<text x="0" y="'+(y+15)+'" font-size="11">'+costLabel(n.k)+'</text><rect x="150" y="'+(y+3)+'" width="'+bw+'" height="'+(rh-8)+'" fill="'+col+'" rx="3"><title>'+costLabel(n.k)+' '+fmt(n.amt)+'</title></rect><text x="'+(155+bw)+'" y="'+(y+15)+'" font-size="11">'+fmtK(n.amt)+' · '+pct(sumShown?n.amt/sumShown:0)+'</text>'});
+  document.getElementById('costChart').innerHTML=svg+'</svg>';
+  document.getElementById('costBarsSub').textContent=COSTFAM==='all'?T('costBarsSub'):D('shareOf')+' '+totLbl.toLowerCase()+' ('+fmt(sumShown)+' MAD)';
+  var sel=document.getElementById('costView');if(sel.value!==COSTVIEW)sel.value=COSTVIEW;
+  var fc=document.querySelectorAll('[data-fam]');for(i=0;i<fc.length;i++)fc[i].classList.toggle('active',fc[i].getAttribute('data-fam')===COSTFAM);
+  var tc=document.querySelectorAll('[data-tag]');for(i=0;i<tc.length;i++)tc[i].classList.toggle('active',!!COSTTAG[tc[i].getAttribute('data-tag')]);
+}
+/* ---------- Revenus tab ---------- */
+function retreatList(W){var out=[];for(var i=0;i<W.length;i++)if(W[i].retreatCount)out.push({wk:W[i].idx,start:W[i].start,pax:W[i].retreatPax,dep:Math.max(1,W[i].idx-H.retreats.depositLeadWeeks),bal:Math.max(1,W[i].idx-H.retreats.balanceLeadWeeks),ttc:W[i].retreatPax*H.retreats.priceTTC*(1-H.retreats.avgDiscount)});return out}
+function vipList(W){var out=[];for(var i=0;i<W.length;i++)if(W[i].vipDays)out.push({wk:W[i].idx,start:W[i].start,days:W[i].vipDays,stays:W[i].vipStays,ttc:W[i].vipDays*M.kpis.vipRateTTC});return out}
+function ventTable(title,rows,cols){var s='<table class="small-tbl"><tr><th>'+title+'</th>'+cols.map(function(c){return '<th class="n">'+c+'</th>'}).join('')+'</tr>';rows.forEach(function(r){s+='<tr>'+r.map(function(c,i){return '<td'+(i?' class="n"':'')+'>'+c+'</td>'}).join('')+'</tr>'});return s+'</table>'}
+function renderRev(W){var mo=monthly(W),R=H.retreats,V=H.vip,A=M.annual,K=M.kpis,i;
+  document.getElementById('revKpis').innerHTML=tile('accent',T('k.ret'),fmt(A.revRetreat)+' <small>MAD HT</small>',pct(A.revenue?A.revRetreat/A.revenue:0)+' · '+K.retreats+' × '+R.participants+' × '+fmt(R.priceTTC)+' TTC','r',REVSEL==='r')+tile('vipc',T('k.vip'),fmt(A.revVip)+' <small>MAD HT</small>',pct(A.revenue?A.revVip/A.revenue:0)+' · '+K.vipDays+' × '+fmt(K.vipRateTTC)+' TTC','v',REVSEL==='v')+kpi('cash',T('k.rev'),fmt(A.revenue)+' <small>MAD HT</small>',T('k.revd')+fmt(K.revenueTTC)+' MAD');
+  var pan='';
+  if(REVSEL==='r'){var rl=retreatList(W),ch=[['direct',R.channels.direct,0],['whatsapp',R.channels.whatsapp,0],['platforms',R.channels.platforms,R.platformCommission],['agents',R.channels.agents,R.agentCommission]];
+    pan='<div class="panel"><button class="close" data-tile="r">✕</button><h4>'+T('k.ret')+' — '+D('detail')+'</h4><div class="pgrid"><div>'+ventTable(D('unitEcon'),[[T('u.priceHT'),fmt(K.priceHT),fmt(K.priceHT*R.participants)],[T('u.comm'),'−'+fmt(R.priceTTC*K.retreatCommRate),'−'+fmt(R.priceTTC*K.retreatCommRate*R.participants)],[T('u.varc'),'−'+fmt(K.varPerPax),'−'+fmt(K.varPerPax*R.participants+K.varRetreatFixed)],['<b>'+T('u.contrib')+'</b>','<b>'+fmt(K.contribPerPax)+'</b>','<b>'+fmt(K.contribPerRetreat)+'</b>']],[T('u.pax'),T('u.ret')])+'<div style="height:10px"></div>'+ventTable(D('channelMix'),ch.map(function(c){return [I18N[LANG].mixc[c[0]],pct(c[1]),pct(c[2])]}),[D('share'),I18N[LANG].mixc.comm])+'</div><div><div class="sub">'+D('schedule')+' ('+rl.length+')</div><div style="max-height:260px;overflow:auto">'+ventTable(D('retreat'),rl.map(function(r){return ['S'+r.wk+' · '+r.start,r.pax,'S'+r.dep,'S'+r.bal,fmt(r.ttc)]}),['pax',D('depositWk'),D('balanceWk'),'TTC'])+'</div></div><div><div class="sub">'+D('monthlyProfile')+' (HT)</div>'+miniBars(mo.map(function(m){return m.r}),'r')+'<div class="sub">'+D('paxSens')+'</div>'+ventTable('pax',[6,7,8,9,10].map(function(px){var h2=clone(H);h2.retreats.participants=px;var e=NurEngine.computeModel(h2).annual;return [px,fmt(e.revRetreat),fmt(e.ebitda)]}),['CA HT','EBITDA'])+'</div></div></div>';}
+  if(REVSEL==='v'){var vd=K.vipDays,vl=vipList(W),ven=V.ventilation,st=ven.stayTypes.map(function(t){var d=t.stays*t.nights;return [D('st_'+t.key),t.stays,d,pct(M.derived.ventDays?d/M.derived.ventDays:0),fmt(t.rateTTC),fmt(d*t.rateTTC/(1+V.vatRate))]});
+    pan='<div class="panel blue"><button class="close" data-tile="v">✕</button><h4>'+T('k.vip')+' — '+D('ventilation')+' ('+vd+' '+D('days')+')</h4><div class="pgrid"><div>'+ventTable(D('byStay'),st,[D('stays'),D('days'),'%',D('rate'),'HT'])+'<div class="sub" style="margin-top:6px">'+(M.checks.ventilationOk?'✓ ':'⚠ ')+D('consistency')+' '+M.derived.ventDays+' / '+M.derived.gridDays+' · '+D('blended')+' '+fmt(K.vipRateTTC)+'</div></div><div>'+ventTable(D('bySegment'),ven.segments.map(function(g){return [D('sg_'+g.key),Math.round(g.share*vd),pct(g.share)]}),[D('days'),'%'])+'<div style="height:10px"></div>'+ventTable(D('byChannel'),ven.channels.map(function(c){return [D('ch_'+c.key),Math.round(c.share*vd),pct(c.share),pct(c.commission)]}),[D('days'),'%',I18N[LANG].mixc.comm])+'</div><div><div class="sub">'+D('monthlyGrid')+'</div>'+miniBars(mo.map(function(m){return m.nv}),'v')+'<div class="sub">'+D('schedule')+' ('+K.vipStays+' '+D('slots')+')</div><div style="max-height:150px;overflow:auto">'+ventTable(D('stay'),vl.map(function(v){return ['S'+v.wk+' · '+v.start,v.stays,v.days,fmt(v.ttc)]}),[D('stays'),D('days'),'TTC'])+'</div><div class="sub" style="margin-top:6px">'+D('contribDay')+' <b>'+fmt(K.contribPerVipDay)+'</b> · '+D('contribStay')+' <b>'+fmt(K.contribPerVipDay*V.minStayDays)+'</b></div></div></div></div>';}
+  document.getElementById('revPanel').innerHTML=pan;
+  var showR=REVSEL!=='v',showV=REVSEL!=='r',c=I18N[LANG].cols;
+  var s='<table><tr><th>'+c.month+'</th>'+(showR?'<th class="n">'+c.nr+'</th><th class="n">'+c.np+'</th><th class="n">'+c.rht+'</th><th class="n">'+c.rttc+'</th>':'')+(showV?'<th class="n">'+c.nv+'</th><th class="n">'+c.vht+'</th><th class="n">'+c.vttc+'</th>':'')+'<th class="n">'+c.tot+'</th></tr>';
+  var t={nr:0,np:0,r:0,nv:0,v:0},rl2=retreatList(W),vl2=vipList(W);
+  for(i=0;i<12;i++){var m=mo[i],open=!!REVOPEN[i];t.nr+=m.nr;t.np+=m.np;t.r+=m.r;t.nv+=m.nv;t.v+=m.v;var tt=(showR?m.r:0)+(showV?m.v:0);
+    s+='<tr class="l1" data-m="'+i+'"><td><span class="xp'+(open?' open':'')+'">'+(open?'−':'+')+'</span>'+MONTHS[LANG][i]+'</td>'+(showR?'<td class="n">'+m.nr+'</td><td class="n">'+m.np+'</td><td class="n">'+fmt(m.r)+'</td><td class="n">'+fmt(m.r*(1+R.vatRate))+'</td>':'')+(showV?'<td class="n">'+m.nv+'</td><td class="n">'+fmt(m.v)+'</td><td class="n">'+fmt(m.v*(1+V.vatRate))+'</td>':'')+'<td class="n"><b>'+fmt(tt)+'</b></td></tr>';
+    if(open){var ncol=1+(showR?4:0)+(showV?3:0)+1;var inMonth=function(start){var md=new Date(start+'T00:00:00Z');md.setUTCDate(md.getUTCDate()+3);return md.getUTCMonth()===i&&md.getUTCFullYear()===W[0].year};
+      if(showR)rl2.filter(function(r){return inMonth(r.start)}).forEach(function(r){s+='<tr class="l2"><td colspan="'+ncol+'"><span class="tag r">'+T('act.r')+'</span> S'+r.wk+' · '+r.start+' · '+r.pax+' pax · '+D('depositWk')+' S'+r.dep+' · '+D('balanceWk')+' S'+r.bal+' · '+fmt(r.ttc)+' TTC</td></tr>'});
+      if(showV)vl2.filter(function(v){return inMonth(v.start)}).forEach(function(v){s+='<tr class="l2"><td colspan="'+ncol+'"><span class="tag v">VIP</span> S'+v.wk+' · '+v.start+' · '+v.stays+' '+D('stays').toLowerCase()+' · '+v.days+' '+D('days')+' · '+fmt(v.ttc)+' TTC</td></tr>'});}}
+  s+='<tr class="total"><td>'+c.total+'</td>'+(showR?'<td class="n">'+t.nr+'</td><td class="n">'+t.np+'</td><td class="n">'+fmt(t.r)+'</td><td class="n">'+fmt(t.r*(1+R.vatRate))+'</td>':'')+(showV?'<td class="n">'+t.nv+'</td><td class="n">'+fmt(t.v)+'</td><td class="n">'+fmt(t.v*(1+V.vatRate))+'</td>':'')+'<td class="n">'+fmt((showR?t.r:0)+(showV?t.v:0))+'</td></tr></table>';
+  document.getElementById('revTable').innerHTML=s;
+  var rc=document.querySelectorAll('[data-revsel]');for(i=0;i<rc.length;i++)rc[i].classList.toggle('active',rc[i].getAttribute('data-revsel')===REVSEL);
+}
+/* ---------- Cash tab ---------- */
+function renderCash(W){var K=M.kpis,A=M.annual;
+  document.getElementById('cashKpis').innerHTML=kpi('accent',T('k.inflow'),fmt(A.inflows)+' <small>MAD</small>','TTC')+kpi('costc',T('k.outflow'),fmt(A.outflows)+' <small>MAD</small>',(LANG==='fr'?'TVA nette ':'net VAT ')+fmt(A.vatPaid)+(H.financing.debtServiceIncluded?' · '+I18N[LANG].cols.fin+' '+fmt(A.financing):''))+kpi('cash',T('k.min'),'<span class="'+(K.minCash<H.calendar.minCashBuffer?'neg':'')+'">'+fmt(K.minCash)+'</span> <small>MAD</small>',T('k.mind')+' '+(K.minCashWeek||(LANG==='fr'?'0 (ouverture)':'0 (opening)')))+kpi('cash',T('k.close'),fmt(K.closingCash)+' <small>MAD</small>',T('k.closed')+' '+fmt(H.calendar.openingCash));
+  var c=I18N[LANG].cols,s='<table><tr><th>'+c.w+'</th><th>'+c.dates+'</th><th>'+c.act+'</th><th class="n">'+c.rd+'</th><th class="n">'+c.rb+'</th><th class="n">'+c.vd+'</th><th class="n">'+c.vb+'</th><th class="n">'+c.tin+'</th><th class="n">'+c.rv+'</th><th class="n">'+c.vv+'</th><th class="n">'+c.co+'</th><th class="n">'+c.pay+'</th><th class="n">'+c.fx+'</th><th class="n">'+c.vat+'</th><th class="n">'+c.fin+'</th><th class="n">'+c.tout+'</th><th class="n">'+c.net+'</th><th class="n">'+c.open+'</th><th class="n">'+c.close+'</th></tr>';
+  W.forEach(function(x){if(CASHF==='act'&&!x.retreatCount&&!x.vipDays)return;if(CASHF==='neg'&&x.net>=0)return;var act=(x.retreatCount?'<span class="tag r">'+T('act.r')+' '+x.retreatPax+'</span>':'')+(x.vipDays?'<span class="tag v">VIP '+x.vipDays+'j</span>':'');
+    s+='<tr><td>'+x.idx+'</td><td>'+x.start.slice(5)+' → '+x.end.slice(5)+'</td><td>'+act+'</td><td class="n">'+fmt(x.inRetreatDeposit)+'</td><td class="n">'+fmt(x.inRetreatBalance)+'</td><td class="n">'+fmt(x.inVipDeposit)+'</td><td class="n">'+fmt(x.inVipBalance)+'</td><td class="n"><b>'+fmt(x.inflows)+'</b></td><td class="n">'+fmt(x.outRetreatVar)+'</td><td class="n">'+fmt(x.outVipVar)+'</td><td class="n">'+fmt(x.outCommissions)+'</td><td class="n">'+fmt(x.outPayroll)+'</td><td class="n">'+fmt(x.outFixed)+'</td><td class="n">'+fmt(x.outVat)+'</td><td class="n">'+fmt(x.outFinancing)+'</td><td class="n"><b>'+fmt(x.outflows)+'</b></td><td class="n '+(x.net<0?'neg':'pos')+'">'+fmt(x.net)+'</td><td class="n">'+fmt(x.opening)+'</td><td class="n" style="'+(x.closing<H.calendar.minCashBuffer?'background:#FBE9E7;color:#B3261E;font-weight:600':'font-weight:600')+'">'+fmt(x.closing)+'</td></tr>'});
+  document.getElementById('cashTable').innerHTML=s+'</table>';
+  var cf=document.querySelectorAll('[data-cashf]');for(var i=0;i<cf.length;i++)cf[i].classList.toggle('active',cf[i].getAttribute('data-cashf')===CASHF);}
+/* ---------- Visualisations ---------- */
+function renderViz(A,K){
+  var paxs=[6,7,8,9,10],prices=[16000,18000,20000,22000,24000],s='<div class="sens"><div class="h">pax \\ MAD</div>';
+  prices.forEach(function(p){s+='<div class="h">'+fmt(p)+'</div>'});
+  paxs.forEach(function(px){s+='<div class="h">'+px+'</div>';prices.forEach(function(p){var h2=clone(H);h2.retreats.participants=px;h2.retreats.priceTTC=p;var e=NurEngine.computeModel(h2).annual.ebitda;var cur=(px===H.retreats.participants&&p===H.retreats.priceTTC);var bg=e<0?'#FBE9E7':e<600000?'#FDF3E7':'#EAF4EC';s+='<div style="background:'+bg+(cur?';font-weight:700;border-color:#2B2622':'')+'">'+fmtK(e)+'</div>'})});
+  document.getElementById('sens').innerHTML=s+'</div>';
+  var steps=[[LANG==='fr'?'CA HT':'Revenue',A.revenue,'#2B2622'],[LANG==='fr'?'Var. retraites':'Retreat var.',-A.varRetreat-A.commRetreat,'#B4552F'],[LANG==='fr'?'Var. VIP':'VIP var.',-A.varVip-A.commVip,'#2a78d6'],[LANG==='fr'?'Salaires':'Payroll',-A.payroll,'#4a3aa7'],['Marketing',-A.marketing,'#4a3aa7'],[LANG==='fr'?'Autres fixes':'Other fixed',-(A.fixedTotal-A.payroll-A.marketing),'#4a3aa7'],['EBITDA',A.ebitda,'#2B2622']];
+  var w=480,h=250,pl=50,pt=16,pb=40,mx=Math.max(1,A.revenue*1.05),mn=Math.min(0,A.ebitda*1.1),y=function(v){return pt+(h-pt-pb)*(1-(v-mn)/(mx-mn))},bw=(w-pl-10)/steps.length*0.6,run=0,svg='<svg viewBox="0 0 '+w+' '+h+'" width="100%">';
+  steps.forEach(function(st,i){var cx=pl+(w-pl-10)*(i+0.5)/steps.length,a,b;if(i===0||i===steps.length-1){a=0;b=st[1];}else{a=run;b=run+st[1];}run=(i===0)?st[1]:(i===steps.length-1?run:b);var top=Math.max(a,b),bot=Math.min(a,b);svg+='<rect x="'+(cx-bw/2)+'" y="'+y(top)+'" width="'+bw+'" height="'+Math.max(1,y(bot)-y(top))+'" fill="'+st[2]+'" rx="3" opacity="'+(i===0||i===steps.length-1?1:.8)+'"><title>'+st[0]+' '+fmt(st[1])+'</title></rect><text x="'+cx+'" y="'+(y(top)-5)+'" font-size="10" text-anchor="middle">'+fmtK(st[1])+'</text><text x="'+cx+'" y="'+(h-22)+'" font-size="10" text-anchor="middle">'+st[0]+'</text>'});
+  svg+='<line x1="'+pl+'" x2="'+(w-10)+'" y1="'+y(0)+'" y2="'+y(0)+'" stroke="#8C8178"/>';document.getElementById('wf').innerHTML=svg+'</svg>';
+  var b=I18N[LANG].be,cap=H.retreats.capacity||1;
+  var gauge=function(lbl,v){var p=Math.min(1,v/cap);return '<div style="margin:10px 0"><div style="display:flex;justify-content:space-between;font-size:12px"><span>'+lbl+'</span><b>'+v.toFixed(1)+' '+b.fmt+'</b></div><div style="height:12px;background:#E3D6C0;border-radius:6px;margin-top:5px;position:relative"><div style="width:'+(p*100)+'%;height:12px;border-radius:6px;background:'+(v>cap?'#B3261E':v>H.retreats.participants?'#B8860B':'#B4552F')+'"></div><div style="position:absolute;left:'+(Math.min(1,H.retreats.participants/cap)*100)+'%;top:-4px;width:2px;height:20px;background:#2B2622"></div></div><div style="font-size:11px;color:#8C8178;margin-top:3px">'+b.cap+' '+cap+' · '+(LANG==='fr'?'trait = hypothèse courante':'line = current assumption')+' ('+H.retreats.participants+')</div></div>'};
+  document.getElementById('be').innerHTML=gauge(b.with,K.breakEvenPax)+gauge(b.without,K.breakEvenPaxNoVip);
+  var R=H.retreats,mc=I18N[LANG].mixc,ch=[['direct',R.channels.direct,0],['whatsapp',R.channels.whatsapp,0],['platforms',R.channels.platforms,R.platformCommission],['agents',R.channels.agents,R.agentCommission]],m='<table><tr><th>'+(LANG==='fr'?'Canal':'Channel')+'</th><th class="n">'+(LANG==='fr'?'Part':'Share')+'</th><th class="n">'+mc.comm+'</th><th class="n">MAD / '+(LANG==='fr'?'an':'yr')+'</th></tr>';
+  var ttcR=A.revRetreat*(1+R.vatRate);
+  ch.forEach(function(c){m+='<tr><td>'+mc[c[0]]+'</td><td class="n">'+pct(c[1])+'</td><td class="n">'+pct(c[2])+'</td><td class="n">'+fmt(ttcR*c[1]*c[2])+'</td></tr>'});
+  m+='<tr><td>'+(LANG==='fr'?'Frais CB':'Card fees')+'</td><td class="n">'+pct(R.cardShare)+'</td><td class="n">'+pct(R.cardFee)+'</td><td class="n">'+fmt(ttcR*R.cardShare*R.cardFee)+'</td></tr><tr class="total"><td>'+(LANG==='fr'?'Taux blended':'Blended rate')+'</td><td></td><td class="n">'+pct(K.retreatCommRate)+'</td><td class="n">'+fmt(A.commRetreat)+'</td></tr></table>';
+  document.getElementById('mix').innerHTML=m;}
+/* ---------- events ---------- */
+document.getElementById('nav').addEventListener('click',function(e){var b=e.target.closest('button');if(!b)return;var t=b.getAttribute('data-tab');document.querySelectorAll('nav button').forEach(function(x){x.classList.toggle('active',x===b)});document.querySelectorAll('section.tab').forEach(function(s){s.classList.toggle('active',s.id==='tab-'+t)});window.scrollTo(0,0);store(UI_KEY,{tab:t});});
+document.querySelector('.scen').addEventListener('click',function(e){if(e.target.id==='btnSaveScen'||e.target.parentNode.id==='btnSaveScen'){var nm=prompt(T('s.name'),H.meta&&H.meta.name&&SCEN!=='base'?H.meta.name:T('s.custom'));if(!nm)return;H.meta=H.meta||{};H.meta.name=nm;CUSTOM[nm]=clone(H);store(SCEN_KEY,CUSTOM);SCEN=nm;DIRTY=false;recompute();return}
+  var b=e.target.closest('.chip[data-scen]');if(!b)return;setScenario(b.getAttribute('data-scen'));});
+document.querySelector('.scen').addEventListener('contextmenu',function(e){var b=e.target.closest('.chip.custom');if(!b)return;e.preventDefault();var k=b.getAttribute('data-scen');if(confirm(T('s.del')+' — '+k)){delete CUSTOM[k];store(SCEN_KEY,CUSTOM);if(SCEN===k)setScenario('base');else renderScenarioBar();}});
+document.getElementById('hypGrid').addEventListener('change',function(e){var el=e.target;if(!el.getAttribute)return;var p=el.getAttribute('data-path');if(!p)return;var type=el.getAttribute('data-type'),v;
+  if(type==='bool')v=!!el.checked;else if(type==='date'||type==='text')v=el.value;else{v=parseFloat(String(el.value).replace(',','.'));if(isNaN(v))return;if(type==='pct')v=v/100;if(type==='int')v=Math.round(v);}
+  setPath(H,p,v);if(p==='integration.endpoint'){ENDPOINT=v;store(STORAGE_KEY,{scen:SCEN,dirty:DIRTY,h:H,lang:LANG});return}markDirty();});
+document.getElementById('tab-cost').addEventListener('click',function(e){var t=e.target.closest('[data-tile]');if(t){var f=t.getAttribute('data-tile');COSTFAM=(COSTFAM===f||t.classList.contains('close'))?'all':f;renderCost(M.annual,M.kpis);return}
+  var f2=e.target.closest('[data-fam]');if(f2){COSTFAM=f2.getAttribute('data-fam');renderCost(M.annual,M.kpis);return}
+  var tg=e.target.closest('[data-tag]');if(tg){var k=tg.getAttribute('data-tag');COSTTAG[k]=!COSTTAG[k];renderCost(M.annual,M.kpis);return}
+  var l1=e.target.closest('tr.l1');if(l1){var kk=l1.getAttribute('data-k');COSTOPEN[kk]=!COSTOPEN[kk];renderCost(M.annual,M.kpis);return}
+  if(e.target.id==='costExpandAll'){costTree(M.annual,M.kpis).forEach(function(n){COSTOPEN[n.k]=true});renderCost(M.annual,M.kpis)}
+  if(e.target.id==='costCollapseAll'){COSTOPEN={};renderCost(M.annual,M.kpis)}});
+document.getElementById('costView').addEventListener('change',function(e){COSTVIEW=e.target.value;renderCost(M.annual,M.kpis)});
+document.getElementById('costSearch').addEventListener('input',function(e){COSTQ=e.target.value;renderCost(M.annual,M.kpis)});
+document.getElementById('tab-rev').addEventListener('click',function(e){var t=e.target.closest('[data-tile]');if(t){var f=t.getAttribute('data-tile');REVSEL=(REVSEL===f||t.classList.contains('close'))?'all':f;renderRev(M.weeks);return}
+  var rs=e.target.closest('[data-revsel]');if(rs){REVSEL=rs.getAttribute('data-revsel');renderRev(M.weeks);return}
+  var l1=e.target.closest('tr.l1');if(l1){var mm=l1.getAttribute('data-m');REVOPEN[mm]=!REVOPEN[mm];renderRev(M.weeks);return}
+  if(e.target.id==='revExpandAll'){for(var i=0;i<12;i++)REVOPEN[i]=true;renderRev(M.weeks)}
+  if(e.target.id==='revCollapseAll'){REVOPEN={};renderRev(M.weeks)}});
+document.getElementById('tab-cash').addEventListener('click',function(e){var b=e.target.closest('[data-cashf]');if(b){CASHF=b.getAttribute('data-cashf');renderCash(M.weeks);return}if(e.target.id==='btnExportLedger2')exportLedger();});
+document.getElementById('btnExportJson').addEventListener('click',exportJson);document.getElementById('btnExportJson2').addEventListener('click',exportJson);
+document.getElementById('btnExportCsvHyp').addEventListener('click',exportCsvHyp);document.getElementById('btnExportCsvHyp2').addEventListener('click',exportCsvHyp);
+document.getElementById('btnExportLedger').addEventListener('click',exportLedger);
+document.getElementById('btnImport').addEventListener('click',function(){document.getElementById('fileImport').click()});
+document.getElementById('fileImport').addEventListener('change',function(e){if(e.target.files&&e.target.files[0])importFile(e.target.files[0]);e.target.value='';});
+document.getElementById('btnReset').addEventListener('click',function(){if(confirm(LANG==='fr'?'Revenir aux hypothèses du scénario de base ?':'Reset to the base scenario?'))setScenario('base')});
+/* ---------- optional endpoint (phase 2) ---------- */
+function syncEndpoint(){var badge=document.getElementById('modeBadge');if(!ENDPOINT){badge.className='mock';badge.textContent=T('mode.local');return}
+  badge.textContent=T('mode.stale');badge.className='mock stale';
+  try{var xhr=new XMLHttpRequest();xhr.open('GET',ENDPOINT+(ENDPOINT.indexOf('?')>0?'&':'?')+'model=nur',true);xhr.onreadystatechange=function(){if(xhr.readyState!==4)return;if(xhr.status===200){try{var o=JSON.parse(xhr.responseText);if(o&&o.hypotheses&&o.hypotheses.calendar){H=o.hypotheses;DIRTY=false;recompute();badge.className='mock live';badge.textContent=T('mode.live');}}catch(e){}}};xhr.send();}catch(e){}}
+/* ---------- boot ---------- */
+(function(){var saved=load(STORAGE_KEY);if(saved&&saved.h&&saved.h.calendar&&saved.h.meta&&saved.h.meta.version==='1.1'){H=saved.h;SCEN=saved.scen||'base';DIRTY=!!saved.dirty;if(saved.lang)LANG=saved.lang;if(!CUSTOM[SCEN]&&['base','ramp','stress','playbook'].indexOf(SCEN)<0)SCEN='custom';}else{H=NurEngine.defaultHypotheses();}
+  ENDPOINT=(H.integration&&H.integration.endpoint)||'';
+  if(LANG==='en'){document.getElementById('langFR').classList.remove('active');document.getElementById('langEN').classList.add('active');var els=document.querySelectorAll('[data-i18n]');for(var i=0;i<els.length;i++)els[i].textContent=T(els[i].getAttribute('data-i18n'));}
+  var ui=load(UI_KEY);if(ui&&ui.tab){var b=document.querySelector('nav button[data-tab="'+ui.tab+'"]');if(b)b.click();}
+  recompute();syncEndpoint();})();
+
+</script>
+</body>
+</html>
