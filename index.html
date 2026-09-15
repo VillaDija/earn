@@ -365,7 +365,7 @@ button.lnk{border:none;background:none;color:var(--terra);cursor:pointer;font:60
         ],
         capitalDeployed: 10000001
       },
-      integration: { endpoint: '', pollMinutes: 5, hypothesesTab: 'NUR_Hypotheses', actualsFeed: false }
+      integration: { endpoint: 'https://script.google.com/macros/s/AKfycbzOVy1v0DupVODtQ7DCZiODW7NmT5Jug7SRsPUIs2HX5PwJsyb8n9tD5WEaPjrN6zgi/exec', pollMinutes: 5, hypothesesTab: 'Hypotheses', actualsFeed: true }
     };
   }
 
@@ -583,7 +583,8 @@ button.lnk{border:none;background:none;color:var(--terra);cursor:pointer;font:60
 </script>
 <script>
 /* ===================== Nûr Retreats — app UI v1.1 (ES5) ===================== */
-var ENDPOINT = ''; // optional Apps Script web-app URL (phase 2, §3.5). Empty = local mode.
+var DEFAULT_ENDPOINT = 'https://script.google.com/macros/s/AKfycbzOVy1v0DupVODtQ7DCZiODW7NmT5Jug7SRsPUIs2HX5PwJsyb8n9tD5WEaPjrN6zgi/exec'; // Nur Retreats BM API, deployed 15 Sep 2026
+var ENDPOINT = DEFAULT_ENDPOINT;  // Apps Script web app; empty it in the Hypotheses tab to work offline
 var STORAGE_KEY = 'nur.hypotheses.v1', SCEN_KEY = 'nur.scenarios.v1', UI_KEY = 'nur.ui.v1';
 var I18N = {
  fr:{subtitle:"Business model & prévisions de trésorerie","mode.local":"MODE LOCAL","mode.live":"SYNCHRONISÉ","mode.stale":"CACHE",print:"Imprimer / PDF",xlsx:"Hypothèses → Sheet (CSV)",ledgerCsv:"Trésorerie (CSV)","t.dash":"Tableau de bord","t.hyp":"Hypothèses","t.rev":"Revenus","t.cost":"Charges","t.cash":"Trésorerie hebdomadaire","t.viz":"Visualisations",scenario:"Scénario :","s.base":"Base (hypothèses KEF)","s.ramp":"Montée en charge","s.stress":"Stress","s.playbook":"Playbook Y1","s.save":"Enregistrer","s.custom":"Scénario personnalisé","s.name":"Nom du scénario ?","s.del":"Supprimer ce scénario ?",cashCurve:"Courbe de trésorerie — 52 semaines",cashCurveSub:"Solde de clôture hebdomadaire vs. seuil de sécurité","l.cash":"Trésorerie de clôture","l.buffer":"Seuil de sécurité","l.in":"Encaissements","l.out":"Décaissements",revSplit:"Revenus mensuels HT",revSplitSub:"Retraites femmes vs. location VIP","l.ret":"Retraites","l.vip":"Location VIP",occ:"Calendrier d'occupation",occSub:"Semaine par semaine — retraites (terracotta) et séjours VIP (bleu)",unit:"Économie unitaire",unitSub:"Contribution après coûts variables et commissions","b.reset":"Réinitialiser (scénario de base)","b.import":"Importer JSON / CSV","b.csv":"Hypothèses → Sheet (CSV)",hypNote:"Le Google Sheet porte les hypothèses officielles ; cette page est un bac à sable. Chaque champ est éditable, tout se recalcule instantanément et reste dans ce navigateur jusqu'à « Publier vers le Sheet ». Les clés en gris sont les plages nommées du modèle.",revTable:"Revenus mensuels — détail par ligne",revTableSub:"HT et TTC, séparés : retraites femmes / location VIP",costTable:"Structure des charges — Année 1",costTableSub:"Variables (par retraite, par participante, par jour VIP) puis fixes",costBars:"Répartition des charges",costBarsSub:"Part de chaque poste dans le total décaissé",cashTable:"Plan de trésorerie hebdomadaire",cashTableSub:"Encaissements (acomptes / soldes) et décaissements par nature, solde d'ouverture et de clôture",sens:"Sensibilité EBITDA — participantes × prix",sensSub:"MAD, année 1 — la case en gras est le scénario courant",wf:"Du chiffre d'affaires à l'EBITDA",wfSub:"Cascade annuelle HT",be:"Point mort",beSub:"Participantes par retraite nécessaires pour couvrir les charges fixes (avec / sans VIP)",mix:"Mix d'encaissement par canal",mixSub:"Part des réservations et commissions associées",foot:"Business model & prévisions de trésorerie v1.2 — les chiffres proviennent des hypothèses affichées et se recalculent à chaque modification. Document de travail, non audité.",
@@ -966,7 +967,7 @@ function hypFromPairs(pairs){
 function sheetUrl(a){ return ENDPOINT + (ENDPOINT.indexOf('?') > 0 ? '&' : '?') + 'action=' + a + '&nocache=1&t=' + (new Date()).getTime(); }
 function httpGet(url, cb){
   try {
-    var x = new XMLHttpRequest(); x.open('GET', url, true); x.timeout = 25000;
+    var x = new XMLHttpRequest(); x.open('GET', url, true); x.timeout = 90000;
     x.onreadystatechange = function(){ if (x.readyState !== 4) return;
       if (x.status >= 200 && x.status < 400) { try { cb(null, JSON.parse(x.responseText)); } catch(e){ cb('parse'); } }
       else cb('http ' + x.status); };
@@ -976,7 +977,7 @@ function httpGet(url, cb){
 }
 function httpPost(url, body, cb){
   try {
-    var x = new XMLHttpRequest(); x.open('POST', url, true); x.timeout = 30000;
+    var x = new XMLHttpRequest(); x.open('POST', url, true); x.timeout = 120000;
     x.setRequestHeader('Content-Type', 'text/plain;charset=utf-8'); /* keeps it a simple request: no CORS preflight */
     x.onreadystatechange = function(){ if (x.readyState !== 4) return;
       if (x.status >= 200 && x.status < 400) { try { cb(null, JSON.parse(x.responseText)); } catch(e){ cb('parse'); } }
@@ -1035,9 +1036,9 @@ function syncBoot(){
 function pullSheet(silent){
   if (!ENDPOINT) { if (!silent) alert(D('sy.noEndpoint')); return; }
   SYNC.pending = true; renderSync();
-  httpGet(sheetUrl('all'), function(err, o){
+  httpGet(sheetUrl('hypotheses'), function(err, o){
     SYNC.pending = false;
-    var hp = o && o.hypotheses;
+    var hp = o && o.pairs ? o : (o && o.hypotheses);
     if (err || !hp || !hp.pairs || !hp.pairs.length) {
       SYNC.state = SHEET ? 'cache' : 'error'; SYNC.err = err || ((o && o.error) || 'payload');
       renderSync(); if (!silent) alert(D('sy.pullFailed') + ' ' + SYNC.err); return;
@@ -1045,13 +1046,21 @@ function pullSheet(silent){
     SHEET = { version: hp.version, updatedAt: hp.updatedAt, label: hp.label, by: hp.by, sheet: hp.sheet,
               pairs: hp.pairs, labels: hp.labels, derived: hp.derived, missing: hp.missing || [],
               kpis: hp.kpis || {}, checks: hp.checks || {}, fetchedAt: new Date().toISOString() };
-    ACTUALS = o.actuals || ACTUALS;
+    if (o && o.actuals) ACTUALS = o.actuals;
     SHEETBASE = hypFromPairs(hp.pairs);
     try { SHEETM = NurEngine.computeModel(SHEETBASE); } catch(e){ SHEETM = null; }
     store(SHEET_KEY, SHEET); if (ACTUALS) store(ACT_KEY, ACTUALS);
     SYNC.state = 'live'; SYNC.at = SHEET.fetchedAt; SYNC.err = '';
     if (SCEN === 'base' && !DIRTY) { H = clone(SHEETBASE); recompute(); }
     else renderSync();
+    pullActuals();
+  });
+}
+function pullActuals(){
+  if (!ENDPOINT) return;
+  httpGet(sheetUrl('actuals'), function(err, a){
+    if (err || !a || a.ok === false || !a.capital) return;
+    ACTUALS = a; store(ACT_KEY, a); renderSync();
   });
 }
 function publishToSheet(){
@@ -1131,7 +1140,7 @@ function renderSync(){
   s += '<div class="c">' + src + (SHEET ? ' <b>v' + SHEET.version + '</b> · ' + (SHEET.label || '') + (SHEET.updatedAt ? ' · ' + SHEET.updatedAt.slice(0, 16).replace('T', ' ') : '') : '') + '</div>';
   if (SYNC.pending) s += '<div class="c">' + D('sy.syncing') + '</div>';
   if (SYNC.err) s += '<div class="c warn">' + D('sy.err') + ' ' + esc(SYNC.err) + '</div>';
-  if (DIRTY && SHEETM) { var dE = M.annual.ebitda - SHEETM.annual.ebitda, dC = M.kpis.closingCash - SHEETM.kpis.closingCash;
+  if (DIRTY && SHEETM && M) { var dE = M.annual.ebitda - SHEETM.annual.ebitda, dC = M.kpis.closingCash - SHEETM.kpis.closingCash;
     s += '<div class="c warn">' + D('sy.dirty') + ' — EBITDA <b>' + (dE >= 0 ? '+' : '−') + fmt(Math.abs(dE)) + '</b> · ' + D('sy.cashEnd') + ' <b>' + (dC >= 0 ? '+' : '−') + fmt(Math.abs(dC)) + '</b> ' + D('sy.vsSheet') + (ENDPOINT ? ' <button class="lnk" data-pub="1">' + D('src.pubNow') + '</button>' : '') + '</div>'; }
   else if (DIRTY) s += '<div class="c warn">' + D('sy.dirty') + '</div>';
   if (SHEET && SHEET.missing && SHEET.missing.length) s += '<div class="c warn">' + D('sy.missing') + ' ' + SHEET.missing.length + '</div>';
@@ -1147,7 +1156,8 @@ function renderSync(){
 
 /* ---------- boot ---------- */
 (function(){var saved=load(STORAGE_KEY);if(saved&&saved.h&&saved.h.calendar&&saved.h.meta&&saved.h.meta.version==='1.1'){H=saved.h;SCEN=saved.scen||'base';DIRTY=!!saved.dirty;if(saved.lang)LANG=saved.lang;if(!CUSTOM[SCEN]&&['base','ramp','stress','playbook'].indexOf(SCEN)<0)SCEN='custom';}else{H=NurEngine.defaultHypotheses();}
-  ENDPOINT=(H.integration&&H.integration.endpoint)||'';
+  ENDPOINT=(H.integration&&typeof H.integration.endpoint==='string')?H.integration.endpoint:DEFAULT_ENDPOINT;
+  if(!ENDPOINT&&!(saved&&saved.h&&saved.h.integration&&saved.h.integration.endpoint===''))ENDPOINT=DEFAULT_ENDPOINT;
   if(LANG==='en'){document.getElementById('langFR').classList.remove('active');document.getElementById('langEN').classList.add('active');var els=document.querySelectorAll('[data-i18n]');for(var i=0;i<els.length;i++)els[i].textContent=T(els[i].getAttribute('data-i18n'));}
   var ui=load(UI_KEY);if(ui&&ui.tab){var b=document.querySelector('nav button[data-tab="'+ui.tab+'"]');if(b)b.click();}
   syncBoot();recompute();})();
