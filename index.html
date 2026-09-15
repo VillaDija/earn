@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Nûr Retreats — Business Model & Cash-Flow v1.1</title>
+<title>Nûr Retreats — Business Model & Cash-Flow v1.2</title>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
 :root{--terra:#B4552F;--terra-d:#8F3F21;--sand:#EFE6D6;--sand-2:#F7F2EA;--sand-3:#E3D6C0;--ink:#2B2622;--ink-2:#5C534B;--ink-3:#8C8178;--line:#DDD2C0;--surface:#FCFBF8;--vip:#2a78d6;--cost:#4a3aa7;--ok:#1b7f4e;--warn:#B8860B;--bad:#B3261E;}
@@ -123,13 +123,33 @@ tr.l3 td:first-child{padding-left:66px}
 .scen .chip.custom{border-style:dashed}
 .scen .chip.dirty::after{content:" •";color:var(--terra)}
 .mock.live{background:#1b7f4e}.mock.stale{background:var(--terra)}
+button.lnk{border:none;background:none;color:var(--terra);cursor:pointer;font:600 11.5px Inter;padding:0 2px;text-decoration:underline}
+.srcrow{display:grid;grid-template-columns:340px 1fr;gap:16px;margin-bottom:16px;align-items:start}
+@media(max-width:1000px){.srcrow{grid-template-columns:1fr}}
+.card.src{background:var(--ink);border-color:#3a322c;padding:14px 16px 16px}
+.srchead{display:flex;align-items:center;gap:8px;font-size:12.5px;color:#C9B99C;padding-bottom:12px;border-bottom:1px solid #3a322c}
+.dot{width:9px;height:9px;border-radius:50%;background:#8aa87c;display:inline-block;flex:none}
+.dot.syncing{background:#B8860B}.dot.stale{background:var(--terra)}.dot.local{background:#6b625a}.dot.err{background:#B3261E}
+.srclbl{color:var(--terra);font-size:11px;letter-spacing:2px;text-transform:uppercase;font-weight:600;margin:14px 0 10px}
+.srcfield{display:block;color:#C9B99C;font-size:12px;margin-bottom:7px;line-height:1.35}
+.card.src input{width:100%;background:#241e1a;border:1px solid #4a403a;border-radius:8px;padding:9px 11px;color:#F3EBDD;font:12px ui-monospace,Menlo,monospace}
+.card.src input:focus{outline:none;border-color:var(--terra)}
+.srcbtns{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+.sb{border:1px solid #4a403a;background:#241e1a;color:#E8DCC8;border-radius:10px;padding:10px 12px;font:600 12.5px Inter;cursor:pointer;text-align:center}
+.sb:hover{border-color:var(--terra);color:#fff}
+.sb.primary{background:var(--terra);border-color:var(--terra);color:#fff}
+.sb.wide{width:100%;margin-top:10px}
+.sb[disabled]{opacity:.45;cursor:default}
+.srcnote{color:#8C8178;font-size:11px;line-height:1.45;margin-top:12px}
+@media print{.card.src{display:none}.srcrow{grid-template-columns:1fr}}
+#syncStrip .c{font-size:11.5px}
 @media print{.topbar,nav,.toolbar,.scen,.fbar,.tbl-hdr-actions,#checks{display:none}section.tab{display:block!important;page-break-after:always}.tblwrap{max-height:none;overflow:visible}body{background:#fff}main{max-width:none;padding:0 6mm}.card,.panel{break-inside:avoid}}
 </style>
 </head>
 <body>
 <div class="topbar">
   <div class="brand"><div class="sun"></div><div><h1>Nûr Retreats</h1><small data-i18n="subtitle">Business model &amp; prévisions de trésorerie</small></div></div>
-  <span class="mock" id="modeBadge" data-i18n="mode.local">v1.1 · MODE LOCAL</span>
+  <span class="mock" id="modeBadge" data-i18n="mode.local">v1.2 · MODE LOCAL</span>
   <div class="spacer"></div>
   <button class="pill active" id="langFR" onclick="setLang('fr')">FR</button>
   <button class="pill" id="langEN" onclick="setLang('en')">EN</button>
@@ -158,6 +178,7 @@ tr.l3 td:first-child{padding-left:66px}
     <button class="chip" id="btnSaveScen" title="Enregistrer les hypothèses courantes comme scénario">＋ <span data-i18n="s.save">Enregistrer</span></button>
     <span class="note" id="scenNote"></span>
   </div>
+  <div class="chips" id="syncStrip" style="margin:-6px 0 14px"></div>
 
   <!-- DASHBOARD -->
   <section class="tab active" id="tab-dash">
@@ -181,9 +202,27 @@ tr.l3 td:first-child{padding-left:66px}
 
   <!-- HYPOTHESES -->
   <section class="tab" id="tab-hyp">
-    <div class="toolbar"><button class="btn primary" id="btnReset" data-i18n="b.reset">Réinitialiser (scénario de base)</button><button class="btn" id="btnImport" data-i18n="b.import">Importer JSON / CSV</button><button class="btn" id="btnExportJson2">JSON</button><button class="btn" id="btnExportCsvHyp2" data-i18n="b.csv">Hypothèses → Sheet (CSV)</button></div>
-    <div id="checks"></div>
-    <div class="callout" data-i18n="hypNote">Chaque champ est éditable ; toutes les vues se recalculent instantanément et sont sauvegardées dans ce navigateur. Les clés affichées en gris sont les plages nommées du modèle Google Sheets (synchronisation par CSV).</div>
+    <div class="srcrow">
+      <div class="card src">
+        <div class="srchead"><span class="dot local" id="srcDot"></span><span id="srcTxt">Mode local</span></div>
+        <div class="srclbl" data-i18n="src.title">Source des données</div>
+        <label class="srcfield" for="epInput" data-i18n="src.ep">Point d'accès Apps Script (vide = mode local)</label>
+        <input id="epInput" type="text" spellcheck="false" autocomplete="off" placeholder="https://script.google.com/macros/s/…/exec">
+        <div class="srcbtns">
+          <button class="sb primary" id="btnSync" data-i18n="src.sync">Synchroniser</button>
+          <button class="sb" id="btnPublish" data-i18n="src.pub">Publier 🔒</button>
+          <button class="sb" id="btnPrint" data-i18n="src.print">Exporter / Imprimer</button>
+          <button class="sb" id="btnExportCsvHyp2">CSV</button>
+          <button class="sb" id="btnExportJson2">JSON</button>
+          <button class="sb" id="btnImport" data-i18n="src.import">Importer</button>
+        </div>
+        <button class="sb wide" id="btnReset" data-i18n="b.reset">Réinitialiser (scénario de base)</button>
+        <div class="srcnote" id="srcNote"></div>
+      </div>
+      <div><div id="checks"></div>
+      <div class="callout" data-i18n="hypNote">Le Google Sheet porte les hypothèses officielles ; cette page est un bac à sable.</div>
+      </div>
+    </div>
     <div class="row g2" id="hypGrid"></div>
   </section>
 
@@ -232,7 +271,7 @@ tr.l3 td:first-child{padding-left:66px}
     </div>
   </section>
 </main>
-<footer>Markarian Realty SARL · Villa Dija, Bahia Golf Beach, Bouznika · <span data-i18n="foot">Business model & prévisions de trésorerie v1.1 — les chiffres proviennent des hypothèses affichées et se recalculent à chaque modification. Document de travail, non audité.</span></footer>
+<footer>Markarian Realty SARL · Villa Dija, Bahia Golf Beach, Bouznika · <span data-i18n="foot">Business model & prévisions de trésorerie v1.2 — les chiffres proviennent des hypothèses affichées et se recalculent à chaque modification. Document de travail, non audité.</span></footer>
 
 
 <script>
@@ -530,15 +569,15 @@ tr.l3 td:first-child{padding-left:66px}
   }
 
   /* Built-in scenarios (full hypothesis sets derived from the base) */
-  function scenario(name) {
-    var h = defaultHypotheses();
+  function scenario(name, base) {
+    var h = base ? JSON.parse(JSON.stringify(base)) : defaultHypotheses();
     function vent(we, lwe, week, day) { var st = h.vip.ventilation.stayTypes; st[0].stays = we; st[1].stays = lwe; st[2].stays = week; st[3].stays = day; }
     if (name === 'ramp') { h.meta.name = 'Montée en charge'; h.retreats.perMonth = [1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2]; h.retreats.participants = 9; h.vip.daysPerMonth = [0, 1, 2, 3, 4, 5, 7, 7, 5, 4, 3, 4]; vent(10, 4, 1, 2); }
     if (name === 'stress') { h.meta.name = 'Stress'; h.retreats.perMonth = [1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2]; h.retreats.participants = 7; h.vip.daysPerMonth = [0, 0, 1, 2, 2, 3, 4, 4, 3, 2, 2, 2]; h.calendar.openingCash = 300000; vent(7, 2, 0, 3); }
     if (name === 'playbook') { h.meta.name = 'Playbook Y1'; h.retreats.perMonth = [1, 1, 2, 2, 2, 2, 2, 2, 2, 1, 1, 2]; h.retreats.participants = 9; h.retreats.priceTTC = 16000; h.vip.daysPerMonth = [1, 1, 3, 4, 4, 5, 7, 7, 5, 3, 2, 3]; vent(10, 4, 1, 2); }
     return h;
   }
-  root.NurEngine = { defaultHypotheses: defaultHypotheses, computeModel: computeModel, derive: derive, scenario: scenario, VERSION: '1.1' };
+  root.NurEngine = { defaultHypotheses: defaultHypotheses, computeModel: computeModel, derive: derive, scenario: scenario, VERSION: '1.2' };
 })(typeof window !== 'undefined' ? window : (typeof module !== 'undefined' ? module.exports : this));
 
 </script>
@@ -547,7 +586,7 @@ tr.l3 td:first-child{padding-left:66px}
 var ENDPOINT = ''; // optional Apps Script web-app URL (phase 2, §3.5). Empty = local mode.
 var STORAGE_KEY = 'nur.hypotheses.v1', SCEN_KEY = 'nur.scenarios.v1', UI_KEY = 'nur.ui.v1';
 var I18N = {
- fr:{subtitle:"Business model & prévisions de trésorerie","mode.local":"v1.1 · MODE LOCAL","mode.live":"v1.1 · SYNCHRONISÉ","mode.stale":"v1.1 · CACHE",print:"Imprimer / PDF",xlsx:"Hypothèses → Sheet (CSV)",ledgerCsv:"Trésorerie (CSV)","t.dash":"Tableau de bord","t.hyp":"Hypothèses","t.rev":"Revenus","t.cost":"Charges","t.cash":"Trésorerie hebdomadaire","t.viz":"Visualisations",scenario:"Scénario :","s.base":"Base (hypothèses KEF)","s.ramp":"Montée en charge","s.stress":"Stress","s.playbook":"Playbook Y1","s.save":"Enregistrer","s.custom":"Scénario personnalisé","s.name":"Nom du scénario ?","s.del":"Supprimer ce scénario ?",cashCurve:"Courbe de trésorerie — 52 semaines",cashCurveSub:"Solde de clôture hebdomadaire vs. seuil de sécurité","l.cash":"Trésorerie de clôture","l.buffer":"Seuil de sécurité","l.in":"Encaissements","l.out":"Décaissements",revSplit:"Revenus mensuels HT",revSplitSub:"Retraites femmes vs. location VIP","l.ret":"Retraites","l.vip":"Location VIP",occ:"Calendrier d'occupation",occSub:"Semaine par semaine — retraites (terracotta) et séjours VIP (bleu)",unit:"Économie unitaire",unitSub:"Contribution après coûts variables et commissions","b.reset":"Réinitialiser (scénario de base)","b.import":"Importer JSON / CSV","b.csv":"Hypothèses → Sheet (CSV)",hypNote:"Chaque champ est éditable ; toutes les vues se recalculent instantanément et sont sauvegardées dans ce navigateur. Les clés en gris sont les plages nommées du modèle Google Sheets (synchronisation par CSV).",revTable:"Revenus mensuels — détail par ligne",revTableSub:"HT et TTC, séparés : retraites femmes / location VIP",costTable:"Structure des charges — Année 1",costTableSub:"Variables (par retraite, par participante, par jour VIP) puis fixes",costBars:"Répartition des charges",costBarsSub:"Part de chaque poste dans le total décaissé",cashTable:"Plan de trésorerie hebdomadaire",cashTableSub:"Encaissements (acomptes / soldes) et décaissements par nature, solde d'ouverture et de clôture",sens:"Sensibilité EBITDA — participantes × prix",sensSub:"MAD, année 1 — la case en gras est le scénario courant",wf:"Du chiffre d'affaires à l'EBITDA",wfSub:"Cascade annuelle HT",be:"Point mort",beSub:"Participantes par retraite nécessaires pour couvrir les charges fixes (avec / sans VIP)",mix:"Mix d'encaissement par canal",mixSub:"Part des réservations et commissions associées",foot:"Business model & prévisions de trésorerie v1.1 — les chiffres proviennent des hypothèses affichées et se recalculent à chaque modification. Document de travail, non audité.",
+ fr:{subtitle:"Business model & prévisions de trésorerie","mode.local":"MODE LOCAL","mode.live":"SYNCHRONISÉ","mode.stale":"CACHE",print:"Imprimer / PDF",xlsx:"Hypothèses → Sheet (CSV)",ledgerCsv:"Trésorerie (CSV)","t.dash":"Tableau de bord","t.hyp":"Hypothèses","t.rev":"Revenus","t.cost":"Charges","t.cash":"Trésorerie hebdomadaire","t.viz":"Visualisations",scenario:"Scénario :","s.base":"Base (hypothèses KEF)","s.ramp":"Montée en charge","s.stress":"Stress","s.playbook":"Playbook Y1","s.save":"Enregistrer","s.custom":"Scénario personnalisé","s.name":"Nom du scénario ?","s.del":"Supprimer ce scénario ?",cashCurve:"Courbe de trésorerie — 52 semaines",cashCurveSub:"Solde de clôture hebdomadaire vs. seuil de sécurité","l.cash":"Trésorerie de clôture","l.buffer":"Seuil de sécurité","l.in":"Encaissements","l.out":"Décaissements",revSplit:"Revenus mensuels HT",revSplitSub:"Retraites femmes vs. location VIP","l.ret":"Retraites","l.vip":"Location VIP",occ:"Calendrier d'occupation",occSub:"Semaine par semaine — retraites (terracotta) et séjours VIP (bleu)",unit:"Économie unitaire",unitSub:"Contribution après coûts variables et commissions","b.reset":"Réinitialiser (scénario de base)","b.import":"Importer JSON / CSV","b.csv":"Hypothèses → Sheet (CSV)",hypNote:"Le Google Sheet porte les hypothèses officielles ; cette page est un bac à sable. Chaque champ est éditable, tout se recalcule instantanément et reste dans ce navigateur jusqu'à « Publier vers le Sheet ». Les clés en gris sont les plages nommées du modèle.",revTable:"Revenus mensuels — détail par ligne",revTableSub:"HT et TTC, séparés : retraites femmes / location VIP",costTable:"Structure des charges — Année 1",costTableSub:"Variables (par retraite, par participante, par jour VIP) puis fixes",costBars:"Répartition des charges",costBarsSub:"Part de chaque poste dans le total décaissé",cashTable:"Plan de trésorerie hebdomadaire",cashTableSub:"Encaissements (acomptes / soldes) et décaissements par nature, solde d'ouverture et de clôture",sens:"Sensibilité EBITDA — participantes × prix",sensSub:"MAD, année 1 — la case en gras est le scénario courant",wf:"Du chiffre d'affaires à l'EBITDA",wfSub:"Cascade annuelle HT",be:"Point mort",beSub:"Participantes par retraite nécessaires pour couvrir les charges fixes (avec / sans VIP)",mix:"Mix d'encaissement par canal",mixSub:"Part des réservations et commissions associées",foot:"Business model & prévisions de trésorerie v1.2 — les chiffres proviennent des hypothèses affichées et se recalculent à chaque modification. Document de travail, non audité.",
   k:{rev:"CA annuel HT",revd:"TTC : ",ret:"Retraites femmes",retd:"retraites · participantes",vip:"Location VIP",vipd:"jours · séjours",ebitda:"EBITDA",ebitdad:"marge",min:"Point bas de trésorerie",mind:"semaine",close:"Trésorerie fin d'année",closed:"ouverture",below:"Semaines sous le seuil",belowd:"seuil",bep:"Point mort / retraite",bepd:"participantes (VIP inclus)",inflow:"Encaissements",outflow:"Décaissements",net:"Flux net"},
   u:{item:"Poste",ret:"Par retraite",pax:"Par participante",vipd:"Par jour VIP",priceHT:"Prix HT",comm:"Commissions & frais",varc:"Coûts variables",contrib:"Contribution",pct:"Taux de contribution"},
   cols:{w:"Sem.",dates:"Dates",act:"Activité",rd:"Acomptes retraites",rb:"Soldes retraites",vd:"Acomptes VIP",vb:"Soldes VIP",tin:"Total encaissé",rv:"Var. retraites",vv:"Var. VIP",co:"Commissions",pay:"Salaires",fx:"Fixes",vat:"TVA",fin:"Dette",tout:"Total décaissé",net:"Flux net",open:"Ouverture",close:"Clôture",month:"Mois",nr:"Retraites",np:"Participantes",rht:"Retraites HT",rttc:"Retraites TTC",nv:"Jours VIP",vht:"VIP HT",vttc:"VIP TTC",tot:"Total HT",total:"TOTAL"},
@@ -559,9 +598,9 @@ var I18N = {
   c:{cv:"Coûts variables",cf:"Charges fixes"},
   h:{cal:"Calendrier & trésorerie",ret:"Retraites femmes",vip:"Location VIP",vent:"Ventilation des jours VIP",pay:"Masse salariale",fix:"Charges fixes",tax:"Fiscalité",fin:"Financement & capital",integ:"Intégration (phase 2)",start:"Date de début (lundi)",weeks:"Horizon (semaines)",open:"Trésorerie d'ouverture",buf:"Seuil de sécurité",pm:"Retraites / mois",pax:"Participantes / retraite",cap:"Capacité (femmes)",nights:"Nuits / retraite",price:"Prix / participante TTC",vat:"TVA",disc:"Remise moyenne",dep:"Acompte",depl:"Acompte reçu (sem. avant)",ball:"Solde reçu (sem. avant)",chd:"Canal direct",chw:"Canal WhatsApp",chp:"Canal plateformes",cha:"Canal agents / TO",pc:"Commission plateformes",ac:"Commission agents",cf:"Frais CB",cs:"Part payée par CB",yoga:"Prof. yoga / retraite",sound:"Sound healer / retraite",tr:"Transferts / retraite",la:"Blanchisserie / retraite",ph:"Photo & contenu / retraite",mi:"Divers / retraite",fb:"F&B / participante / jour",spa:"Soins spa / participante",kit:"Kit de bienvenue / participante",vd:"Jours VIP / mois",ms:"Séjour minimum (jours)",ag:"Invités moyens / jour",vfb:"F&B / jour",vst:"Personnel extra / jour",vdr:"Chauffeur & carburant / jour",vna:"Jetski & RIB / jour",vla:"Blanchisserie / jour",vex:"Expériences / jour",vam:"Amenities / jour",stays:"Séjours",nightsC:"Nuits",rate:"Tarif / jour TTC",share:"Part",commission:"Commission",er:"Charges patronales",role:"Rôle",n:"Effectif",gross:"Brut mensuel",from:"De (mois)",to:"À (mois)",perm:"Permanents",seas:"Saisonniers",util:"Utilities / mois",sup:"Fournitures / mois",mai:"Maintenance / mois",mk:"Marketing / an",fl:"Front-load marketing (mois 1–3)",ins:"Assurances / an",insw:"Semaine de paiement assurance",adm:"Honoraires & admin / mois",tx:"Patente & taxes / an",txw:"Semaine de paiement taxes",tt:"Taxe de séjour / personne-nuit",rent:"Loyer intra-groupe / mois",ivat:"TVA déductible (taux blended)",is:"Taux IS",debt:"Service de la dette porté par l'exploitation",cca:"Solde CCA",ccar:"Taux CCA",lender:"Prêteur",principal:"Principal",lrate:"Taux",years:"Durée (ans)",legacy:"Utiliser l'amortissement hérité (44 040)",legacyAmt:"Amortissement hérité / an",asset:"Actif",base:"Base",drate:"Taux",cap2:"Capital déployé",endpoint:"URL Apps Script (vide = mode local)",derived:"Valeurs dérivées"},
   chk:{ok:"Toutes les cohérences sont respectées.",vent:"Ventilation VIP : les jours par type de séjour ({a}) ne correspondent pas à la grille mensuelle ({b}).",ch:"Les parts des canaux VIP ne totalisent pas 100 %.",sg:"Les parts des segments VIP ne totalisent pas 100 %.",rch:"Les parts des canaux retraites ne totalisent pas 100 %.",cap:"Participantes > capacité : les retraites sont plafonnées à la capacité.",conf:"Conflit de planning : mois {m} — {a} jours VIP demandés, {b} placés (créneaux libres épuisés)."},
-  d:{slots:"créneaux planifiés",close:"fermer",details:"détails",detail:"détail",capDeployed:"Capital déployé",ebitdaYield:"Rendement EBITDA / capital",deprAsset:"Amortissements",legacy:"hérité",debt:"Dette de construction",loans:"prêts",debtOff:"hors périmètre (switch = non)",debtOn:"service de la dette inclus dans la trésorerie",perRetreat:"Par retraite",perVipDay:"Par jour VIP",facil:"Facilitateurs (yoga, sound healer)",fb:"F&B participantes",spa:"Soins spa",kit:"Kit de bienvenue",transfers:"Transferts",laundry:"Blanchisserie",photo:"Photo & contenu",misc:"Divers",platforms:"Plateformes",agents:"Agents / TO",card:"Frais CB",concierge:"Conciergeries & agents",extraStaff:"Personnel extra",driver:"Chauffeur & carburant",experiences:"Expériences (golf, cuisine, poterie)",pools:"Piscines & spa",building:"Bâtiment",gardens:"Jardins",nauticalEq:"Équipements nautiques",mk_meta:"Meta Ads",mk_google:"Google Ads",mk_tiktok:"TikTok Ads",mk_influencers:"Influenceurs",mk_content:"Contenu & photo",mk_pr:"PR & médias",mk_direct:"Marketing direct & events",mk_crm:"CRM / tech",mk_contingency:"Contingence",multirisk:"Multirisque",liability:"RC exploitation",workAccidents:"Accidents du travail",accountant:"Comptable",legal:"Juridique",licences:"Licences & abonnements",patente:"Patente / TSC",property:"Taxe foncière",other:"Autres",rentLine:"Loyer mensuel",ofRev:"du CA",varc:"Coûts variables",comm:"Commissions & frais",contrib:"Contribution",monthlyProfile:"Profil mensuel",splitRV:"Retraites / VIP",composition:"Composition",insSpike:"pic = assurance",coverage:"Couverture des fixes",coverageSub:"contribution ÷ charges fixes",totalCosts:"Total charges (hors TVA, IS, dette)",filtered:"filtré",shareOf:"Part de chaque poste dans",unitEcon:"Économie unitaire",channelMix:"Mix de canaux",share:"Part",schedule:"Calendrier",retreat:"Retraite",depositWk:"acompte",balanceWk:"solde",paxSens:"Sensibilité participantes",ventilation:"ventilation des jours",days:"jours",byStay:"Par type de séjour",stays:"Séjours",rate:"Tarif",consistency:"cohérence jours",blended:"tarif blended",bySegment:"Par segment client",byChannel:"Par canal",monthlyGrid:"Grille mensuelle (jours)",stay:"Séjour",contribDay:"Contribution / jour",contribStay:"/ séjour",st_we:"Week-end (2 nuits)",st_lwe:"Long week-end / férié (4 nuits)",st_week:"Semaine complète (7 nuits)",st_day:"Événement / shooting (1 jour)",sg_mar:"Familles HNW Maroc (Casa / Rabat)",sg_gcc:"Familles GCC",sg_eur:"Européens / corporate",sg_evt:"Événements & productions",ch_direct:"Direct & referral",ch_concierge:"Conciergeries & agents",ch_platforms:"Plateformes villas",eau:"Eau",electricite:"Électricité",telecom:"Télécom",streaming:"Streaming",gaz:"Gaz",bois:"Bois",linge:"Linge",nettoyage:"Nettoyage",nautical:"Équipements nautiques",vipDebt:"Dette"}
+  d:{"sy.noEndpoint":"Aucune URL Apps Script n'est renseignée (onglet Hypothèses → Intégration).","sy.pullFailed":"Lecture du Sheet impossible :","sy.pubFailed":"Publication refusée :","sy.label":"Nom de la version publiée ?","sy.defLabel":"Hypothèses validées","sy.pw":"Mot de passe de publication :","sy.published":"Publié dans le Sheet —","sy.values":"valeurs écrites","sy.rejected":"Clés refusées :","sy.syncing":"SYNCHRONISATION…","sy.sheet":"SHEET","sy.sandbox":"BAC À SABLE","sy.cache":"CACHE","sy.offline":"HORS LIGNE","sy.srcLive":"Source : Google Sheet","sy.srcCache":"Source : cache local du Sheet","sy.srcErr":"Sheet injoignable","sy.err":"Erreur :","sy.dirty":"Modifications locales non publiées (bac à sable)","sy.missing":"Plages nommées introuvables dans le Sheet :","sy.diff":"Écart app / Sheet :","sy.match":"Base app = Sheet (mêmes chiffres)","src.title":"Source des données","src.ep":"Point d'accès Apps Script (vide = mode local)","src.sync":"Synchroniser","src.pub":"Publier 🔒","src.print":"Exporter / Imprimer","src.import":"Importer","src.live":"En direct ·","src.cache":"Cache du","src.local":"Mode local · instantané intégré","src.syncing":"Synchronisation…","src.down":"Point d'accès injoignable","src.note":"Sans URL, l'application tourne hors ligne sur les hypothèses d'usine. Avec l'URL Apps Script du Sheet, elle lit les hypothèses officielles et les réalisés, et peut republier une version validée (mot de passe).","src.pubNow":"publier","sy.baseSheet":"Base (Sheet)","sy.nRet":"retraites","sy.nVip":"jours VIP","sy.cashEnd":"trésorerie fin d'année","sy.vsSheet":"vs le Sheet","sy.capital":"Capital déployé (réel)","sy.adopt":"adopter","sy.localMode":"Mode local — les hypothèses vivent dans ce navigateur. Renseignez l'URL Apps Script (onglet Hypothèses) pour lire le Sheet.","b.pull":"Recharger depuis le Sheet","b.publish":"Publier vers le Sheet",slots:"créneaux planifiés",close:"fermer",details:"détails",detail:"détail",capDeployed:"Capital déployé",ebitdaYield:"Rendement EBITDA / capital",deprAsset:"Amortissements",legacy:"hérité",debt:"Dette de construction",loans:"prêts",debtOff:"hors périmètre (switch = non)",debtOn:"service de la dette inclus dans la trésorerie",perRetreat:"Par retraite",perVipDay:"Par jour VIP",facil:"Facilitateurs (yoga, sound healer)",fb:"F&B participantes",spa:"Soins spa",kit:"Kit de bienvenue",transfers:"Transferts",laundry:"Blanchisserie",photo:"Photo & contenu",misc:"Divers",platforms:"Plateformes",agents:"Agents / TO",card:"Frais CB",concierge:"Conciergeries & agents",extraStaff:"Personnel extra",driver:"Chauffeur & carburant",experiences:"Expériences (golf, cuisine, poterie)",pools:"Piscines & spa",building:"Bâtiment",gardens:"Jardins",nauticalEq:"Équipements nautiques",mk_meta:"Meta Ads",mk_google:"Google Ads",mk_tiktok:"TikTok Ads",mk_influencers:"Influenceurs",mk_content:"Contenu & photo",mk_pr:"PR & médias",mk_direct:"Marketing direct & events",mk_crm:"CRM / tech",mk_contingency:"Contingence",multirisk:"Multirisque",liability:"RC exploitation",workAccidents:"Accidents du travail",accountant:"Comptable",legal:"Juridique",licences:"Licences & abonnements",patente:"Patente / TSC",property:"Taxe foncière",other:"Autres",rentLine:"Loyer mensuel",ofRev:"du CA",varc:"Coûts variables",comm:"Commissions & frais",contrib:"Contribution",monthlyProfile:"Profil mensuel",splitRV:"Retraites / VIP",composition:"Composition",insSpike:"pic = assurance",coverage:"Couverture des fixes",coverageSub:"contribution ÷ charges fixes",totalCosts:"Total charges (hors TVA, IS, dette)",filtered:"filtré",shareOf:"Part de chaque poste dans",unitEcon:"Économie unitaire",channelMix:"Mix de canaux",share:"Part",schedule:"Calendrier",retreat:"Retraite",depositWk:"acompte",balanceWk:"solde",paxSens:"Sensibilité participantes",ventilation:"ventilation des jours",days:"jours",byStay:"Par type de séjour",stays:"Séjours",rate:"Tarif",consistency:"cohérence jours",blended:"tarif blended",bySegment:"Par segment client",byChannel:"Par canal",monthlyGrid:"Grille mensuelle (jours)",stay:"Séjour",contribDay:"Contribution / jour",contribStay:"/ séjour",st_we:"Week-end (2 nuits)",st_lwe:"Long week-end / férié (4 nuits)",st_week:"Semaine complète (7 nuits)",st_day:"Événement / shooting (1 jour)",sg_mar:"Familles HNW Maroc (Casa / Rabat)",sg_gcc:"Familles GCC",sg_eur:"Européens / corporate",sg_evt:"Événements & productions",ch_direct:"Direct & referral",ch_concierge:"Conciergeries & agents",ch_platforms:"Plateformes villas",eau:"Eau",electricite:"Électricité",telecom:"Télécom",streaming:"Streaming",gaz:"Gaz",bois:"Bois",linge:"Linge",nettoyage:"Nettoyage",nautical:"Équipements nautiques",vipDebt:"Dette"}
  },
- en:{subtitle:"Business model & cash-flow forecast","mode.local":"v1.1 · LOCAL MODE","mode.live":"v1.1 · SYNCED","mode.stale":"v1.1 · CACHED",print:"Print / PDF",xlsx:"Assumptions → Sheet (CSV)",ledgerCsv:"Cash-flow (CSV)","t.dash":"Dashboard","t.hyp":"Assumptions","t.rev":"Revenues","t.cost":"Expenses","t.cash":"Weekly cash-flow","t.viz":"Visualisations",scenario:"Scenario:","s.base":"Base (KEF assumptions)","s.ramp":"Ramp-up","s.stress":"Stress","s.playbook":"Playbook Y1","s.save":"Save","s.custom":"Custom scenario","s.name":"Scenario name?","s.del":"Delete this scenario?",cashCurve:"Cash curve — 52 weeks",cashCurveSub:"Weekly closing balance vs. safety buffer","l.cash":"Closing cash","l.buffer":"Safety buffer","l.in":"Receipts","l.out":"Payments",revSplit:"Monthly revenue (ex-VAT)",revSplitSub:"Women's retreats vs. VIP rental","l.ret":"Retreats","l.vip":"VIP rental",occ:"Occupancy calendar",occSub:"Week by week — retreats (terracotta) and VIP stays (blue)",unit:"Unit economics",unitSub:"Contribution after variable costs and commissions","b.reset":"Reset (base scenario)","b.import":"Import JSON / CSV","b.csv":"Assumptions → Sheet (CSV)",hypNote:"Every field is editable; all views recalculate instantly and are saved in this browser. Grey keys are the named ranges of the Google Sheets model (CSV sync).",revTable:"Monthly revenue — by line",revTableSub:"Ex-VAT and incl. VAT, separated: women's retreats / VIP rental",costTable:"Cost structure — Year 1",costTableSub:"Variable (per retreat, per participant, per VIP day) then fixed",costBars:"Cost breakdown",costBarsSub:"Share of each item in total payments",cashTable:"Weekly cash plan",cashTableSub:"Receipts (deposits / balances) and payments by nature, opening and closing balance",sens:"EBITDA sensitivity — participants × price",sensSub:"MAD, year 1 — bold cell is the current scenario",wf:"From revenue to EBITDA",wfSub:"Annual waterfall, ex-VAT",be:"Break-even",beSub:"Participants per retreat needed to cover fixed costs (with / without VIP)",mix:"Booking channel mix",mixSub:"Share of bookings and related commissions",foot:"Business model & cash-flow forecast v1.1 — figures come from the displayed assumptions and recalculate on every change. Working document, unaudited.",
+ en:{subtitle:"Business model & cash-flow forecast","mode.local":"LOCAL MODE","mode.live":"SYNCED","mode.stale":"CACHED",print:"Print / PDF",xlsx:"Assumptions → Sheet (CSV)",ledgerCsv:"Cash-flow (CSV)","t.dash":"Dashboard","t.hyp":"Assumptions","t.rev":"Revenues","t.cost":"Expenses","t.cash":"Weekly cash-flow","t.viz":"Visualisations",scenario:"Scenario:","s.base":"Base (KEF assumptions)","s.ramp":"Ramp-up","s.stress":"Stress","s.playbook":"Playbook Y1","s.save":"Save","s.custom":"Custom scenario","s.name":"Scenario name?","s.del":"Delete this scenario?",cashCurve:"Cash curve — 52 weeks",cashCurveSub:"Weekly closing balance vs. safety buffer","l.cash":"Closing cash","l.buffer":"Safety buffer","l.in":"Receipts","l.out":"Payments",revSplit:"Monthly revenue (ex-VAT)",revSplitSub:"Women's retreats vs. VIP rental","l.ret":"Retreats","l.vip":"VIP rental",occ:"Occupancy calendar",occSub:"Week by week — retreats (terracotta) and VIP stays (blue)",unit:"Unit economics",unitSub:"Contribution after variable costs and commissions","b.reset":"Reset (base scenario)","b.import":"Import JSON / CSV","b.csv":"Assumptions → Sheet (CSV)",hypNote:"The Google Sheet holds the official assumptions; this page is a sandbox. Every field is editable, everything recalculates instantly and stays in this browser until you press \u00ab Publish to the Sheet \u00bb. Grey keys are the named ranges of the model.",revTable:"Monthly revenue — by line",revTableSub:"Ex-VAT and incl. VAT, separated: women's retreats / VIP rental",costTable:"Cost structure — Year 1",costTableSub:"Variable (per retreat, per participant, per VIP day) then fixed",costBars:"Cost breakdown",costBarsSub:"Share of each item in total payments",cashTable:"Weekly cash plan",cashTableSub:"Receipts (deposits / balances) and payments by nature, opening and closing balance",sens:"EBITDA sensitivity — participants × price",sensSub:"MAD, year 1 — bold cell is the current scenario",wf:"From revenue to EBITDA",wfSub:"Annual waterfall, ex-VAT",be:"Break-even",beSub:"Participants per retreat needed to cover fixed costs (with / without VIP)",mix:"Booking channel mix",mixSub:"Share of bookings and related commissions",foot:"Business model & cash-flow forecast v1.2 — figures come from the displayed assumptions and recalculate on every change. Working document, unaudited.",
   k:{rev:"Annual revenue (ex-VAT)",revd:"incl. VAT: ",ret:"Women's retreats",retd:"retreats · participants",vip:"VIP rental",vipd:"days · stays",ebitda:"EBITDA",ebitdad:"margin",min:"Cash low point",mind:"week",close:"Year-end cash",closed:"opening",below:"Weeks below buffer",belowd:"buffer",bep:"Break-even / retreat",bepd:"participants (incl. VIP)",inflow:"Receipts",outflow:"Payments",net:"Net flow"},
   u:{item:"Item",ret:"Per retreat",pax:"Per participant",vipd:"Per VIP day",priceHT:"Price ex-VAT",comm:"Commissions & fees",varc:"Variable costs",contrib:"Contribution",pct:"Contribution rate"},
   cols:{w:"Wk",dates:"Dates",act:"Activity",rd:"Retreat deposits",rb:"Retreat balances",vd:"VIP deposits",vb:"VIP balances",tin:"Total receipts",rv:"Retreat var.",vv:"VIP var.",co:"Commissions",pay:"Payroll",fx:"Fixed",vat:"VAT",fin:"Debt",tout:"Total payments",net:"Net flow",open:"Opening",close:"Closing",month:"Month",nr:"Retreats",np:"Participants",rht:"Retreats ex-VAT",rttc:"Retreats incl. VAT",nv:"VIP days",vht:"VIP ex-VAT",vttc:"VIP incl. VAT",tot:"Total ex-VAT",total:"TOTAL"},
@@ -573,11 +612,11 @@ var I18N = {
   c:{cv:"Variable costs",cf:"Fixed costs"},
   h:{cal:"Calendar & cash",ret:"Women's retreats",vip:"VIP rental",vent:"VIP days ventilation",pay:"Payroll",fix:"Fixed costs",tax:"Tax",fin:"Financing & capital",integ:"Integration (phase 2)",start:"Start date (Monday)",weeks:"Horizon (weeks)",open:"Opening cash",buf:"Safety buffer",pm:"Retreats / month",pax:"Participants / retreat",cap:"Capacity (women)",nights:"Nights / retreat",price:"Price / participant incl. VAT",vat:"VAT",disc:"Average discount",dep:"Deposit",depl:"Deposit received (weeks before)",ball:"Balance received (weeks before)",chd:"Direct channel",chw:"WhatsApp channel",chp:"Platforms channel",cha:"Agents / TO channel",pc:"Platform commission",ac:"Agent commission",cf:"Card fee",cs:"Share paid by card",yoga:"Yoga teacher / retreat",sound:"Sound healer / retreat",tr:"Transfers / retreat",la:"Laundry / retreat",ph:"Photo & content / retreat",mi:"Misc / retreat",fb:"F&B / participant / day",spa:"Spa treatments / participant",kit:"Welcome kit / participant",vd:"VIP days / month",ms:"Minimum stay (days)",ag:"Average guests / day",vfb:"F&B / day",vst:"Extra staff / day",vdr:"Driver & fuel / day",vna:"Jetski & RIB / day",vla:"Laundry / day",vex:"Experiences / day",vam:"Amenities / day",stays:"Stays",nightsC:"Nights",rate:"Rate / day incl. VAT",share:"Share",commission:"Commission",er:"Employer charges",role:"Role",n:"Headcount",gross:"Monthly gross",from:"From (month)",to:"To (month)",perm:"Permanent",seas:"Seasonal",util:"Utilities / month",sup:"Supplies / month",mai:"Maintenance / month",mk:"Marketing / year",fl:"Marketing front-load (months 1–3)",ins:"Insurance / year",insw:"Insurance payment week",adm:"Fees & admin / month",tx:"Business & local taxes / year",txw:"Taxes payment week",tt:"Tourist tax / person-night",rent:"Intra-group rent / month",ivat:"Recoverable VAT (blended rate)",is:"Corporate tax rate",debt:"Debt service carried by the operator",cca:"CCA balance",ccar:"CCA rate",lender:"Lender",principal:"Principal",lrate:"Rate",years:"Years",legacy:"Use legacy depreciation (44,040)",legacyAmt:"Legacy depreciation / year",asset:"Asset",base:"Base",drate:"Rate",cap2:"Capital deployed",endpoint:"Apps Script URL (empty = local mode)",derived:"Derived values"},
   chk:{ok:"All consistency checks pass.",vent:"VIP ventilation: days by stay type ({a}) do not match the monthly grid ({b}).",ch:"VIP channel shares do not sum to 100 %.",sg:"VIP segment shares do not sum to 100 %.",rch:"Retreat channel shares do not sum to 100 %.",cap:"Participants > capacity: retreats are capped at capacity.",conf:"Scheduling conflict: month {m} — {a} VIP days requested, {b} placed (free slots exhausted)."},
-  d:{slots:"scheduled slots",close:"close",details:"details",detail:"detail",capDeployed:"Capital deployed",ebitdaYield:"EBITDA yield on capital",deprAsset:"Depreciation",legacy:"legacy",debt:"Construction debt",loans:"loans",debtOff:"out of scope (switch = off)",debtOn:"debt service included in the cash-flow",perRetreat:"Per retreat",perVipDay:"Per VIP day",facil:"Facilitators (yoga, sound healer)",fb:"F&B participants",spa:"Spa treatments",kit:"Welcome kit",transfers:"Transfers",laundry:"Laundry",photo:"Photo & content",misc:"Misc",platforms:"Platforms",agents:"Agents / TO",card:"Card fees",concierge:"Concierges & agents",extraStaff:"Extra staff",driver:"Driver & fuel",experiences:"Experiences (golf, cooking, pottery)",pools:"Pools & spa",building:"Building",gardens:"Gardens",nauticalEq:"Nautical equipment",mk_meta:"Meta Ads",mk_google:"Google Ads",mk_tiktok:"TikTok Ads",mk_influencers:"Influencers",mk_content:"Content & photo",mk_pr:"PR & media",mk_direct:"Direct marketing & events",mk_crm:"CRM / tech",mk_contingency:"Contingency",multirisk:"Multi-risk",liability:"Liability",workAccidents:"Work accidents",accountant:"Accountant",legal:"Legal",licences:"Licences & subscriptions",patente:"Business tax / TSC",property:"Property tax",other:"Other",rentLine:"Monthly rent",ofRev:"of revenue",varc:"Variable costs",comm:"Commissions & fees",contrib:"Contribution",monthlyProfile:"Monthly profile",splitRV:"Retreats / VIP",composition:"Composition",insSpike:"spike = insurance",coverage:"Fixed-cost coverage",coverageSub:"contribution ÷ fixed costs",totalCosts:"Total costs (ex VAT, tax, debt)",filtered:"filtered",shareOf:"Share of each item in",unitEcon:"Unit economics",channelMix:"Channel mix",share:"Share",schedule:"Schedule",retreat:"Retreat",depositWk:"deposit",balanceWk:"balance",paxSens:"Participants sensitivity",ventilation:"ventilation of days",days:"days",byStay:"By stay type",stays:"Stays",rate:"Rate",consistency:"days consistency",blended:"blended rate",bySegment:"By client segment",byChannel:"By channel",monthlyGrid:"Monthly grid (days)",stay:"Stay",contribDay:"Contribution / day",contribStay:"/ stay",st_we:"Week-end (2 nights)",st_lwe:"Long week-end / holiday (4 nights)",st_week:"Full week (7 nights)",st_day:"Event / shooting (1 day)",sg_mar:"Moroccan HNW families (Casa / Rabat)",sg_gcc:"GCC families",sg_eur:"European / corporate",sg_evt:"Events & productions",ch_direct:"Direct & referral",ch_concierge:"Concierges & agents",ch_platforms:"Villa platforms",eau:"Water",electricite:"Electricity",telecom:"Telecom",streaming:"Streaming",gaz:"Gas",bois:"Firewood",linge:"Linen",nettoyage:"Cleaning",nautical:"Nautical equipment",vipDebt:"Debt"}
+  d:{"sy.noEndpoint":"No Apps Script URL set (Assumptions tab → Integration).","sy.pullFailed":"Could not read the Sheet:","sy.pubFailed":"Publish refused:","sy.label":"Name of the published version?","sy.defLabel":"Approved assumptions","sy.pw":"Publishing password:","sy.published":"Published to the Sheet —","sy.values":"values written","sy.rejected":"Rejected keys:","sy.syncing":"SYNCING…","sy.sheet":"SHEET","sy.sandbox":"SANDBOX","sy.cache":"CACHED","sy.offline":"OFFLINE","sy.srcLive":"Source: Google Sheet","sy.srcCache":"Source: local cache of the Sheet","sy.srcErr":"Sheet unreachable","sy.err":"Error:","sy.dirty":"Local changes not published (sandbox)","sy.missing":"Named ranges missing in the Sheet:","sy.diff":"App / Sheet gap:","sy.match":"App base = Sheet (same figures)","src.title":"Data source","src.ep":"Apps Script endpoint (empty = local mode)","src.sync":"Sync now","src.pub":"Publish 🔒","src.print":"Export / Print","src.import":"Import","src.live":"Live ·","src.cache":"Cached","src.local":"Local mode · built-in snapshot","src.syncing":"Syncing…","src.down":"Endpoint unreachable","src.note":"Without a URL the app runs offline on the factory assumptions. With the Sheet's Apps Script URL it reads the official assumptions and the actuals, and can publish an approved version back (password).","src.pubNow":"publish","sy.baseSheet":"Base (Sheet)","sy.nRet":"retreats","sy.nVip":"VIP days","sy.cashEnd":"year-end cash","sy.vsSheet":"vs the Sheet","sy.capital":"Capital deployed (actual)","sy.adopt":"adopt","sy.localMode":"Local mode — assumptions live in this browser. Paste the Apps Script URL (Assumptions tab) to read the Sheet.","b.pull":"Reload from the Sheet","b.publish":"Publish to the Sheet",slots:"scheduled slots",close:"close",details:"details",detail:"detail",capDeployed:"Capital deployed",ebitdaYield:"EBITDA yield on capital",deprAsset:"Depreciation",legacy:"legacy",debt:"Construction debt",loans:"loans",debtOff:"out of scope (switch = off)",debtOn:"debt service included in the cash-flow",perRetreat:"Per retreat",perVipDay:"Per VIP day",facil:"Facilitators (yoga, sound healer)",fb:"F&B participants",spa:"Spa treatments",kit:"Welcome kit",transfers:"Transfers",laundry:"Laundry",photo:"Photo & content",misc:"Misc",platforms:"Platforms",agents:"Agents / TO",card:"Card fees",concierge:"Concierges & agents",extraStaff:"Extra staff",driver:"Driver & fuel",experiences:"Experiences (golf, cooking, pottery)",pools:"Pools & spa",building:"Building",gardens:"Gardens",nauticalEq:"Nautical equipment",mk_meta:"Meta Ads",mk_google:"Google Ads",mk_tiktok:"TikTok Ads",mk_influencers:"Influencers",mk_content:"Content & photo",mk_pr:"PR & media",mk_direct:"Direct marketing & events",mk_crm:"CRM / tech",mk_contingency:"Contingency",multirisk:"Multi-risk",liability:"Liability",workAccidents:"Work accidents",accountant:"Accountant",legal:"Legal",licences:"Licences & subscriptions",patente:"Business tax / TSC",property:"Property tax",other:"Other",rentLine:"Monthly rent",ofRev:"of revenue",varc:"Variable costs",comm:"Commissions & fees",contrib:"Contribution",monthlyProfile:"Monthly profile",splitRV:"Retreats / VIP",composition:"Composition",insSpike:"spike = insurance",coverage:"Fixed-cost coverage",coverageSub:"contribution ÷ fixed costs",totalCosts:"Total costs (ex VAT, tax, debt)",filtered:"filtered",shareOf:"Share of each item in",unitEcon:"Unit economics",channelMix:"Channel mix",share:"Share",schedule:"Schedule",retreat:"Retreat",depositWk:"deposit",balanceWk:"balance",paxSens:"Participants sensitivity",ventilation:"ventilation of days",days:"days",byStay:"By stay type",stays:"Stays",rate:"Rate",consistency:"days consistency",blended:"blended rate",bySegment:"By client segment",byChannel:"By channel",monthlyGrid:"Monthly grid (days)",stay:"Stay",contribDay:"Contribution / day",contribStay:"/ stay",st_we:"Week-end (2 nights)",st_lwe:"Long week-end / holiday (4 nights)",st_week:"Full week (7 nights)",st_day:"Event / shooting (1 day)",sg_mar:"Moroccan HNW families (Casa / Rabat)",sg_gcc:"GCC families",sg_eur:"European / corporate",sg_evt:"Events & productions",ch_direct:"Direct & referral",ch_concierge:"Concierges & agents",ch_platforms:"Villa platforms",eau:"Water",electricite:"Electricity",telecom:"Telecom",streaming:"Streaming",gaz:"Gas",bois:"Firewood",linge:"Linen",nettoyage:"Cleaning",nautical:"Nautical equipment",vipDebt:"Debt"}
  }
 };
 var LANG='fr', SCEN='base', DIRTY=false, MONTHS={fr:["Jan","Fév","Mar","Avr","Mai","Juin","Juil","Août","Sep","Oct","Nov","Déc"],en:["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"]};
-function T(k){var d=I18N[LANG];var p=k.split('.');if(p.length===2&&typeof d[p[0]]==='object'&&d[p[0]]!==null&&d[p[0]][p[1]]!==undefined)return d[p[0]][p[1]];return d[k]!==undefined?d[k]:k}
+function T(k){var d=I18N[LANG];var p=k.split('.');if(p.length===2&&typeof d[p[0]]==='object'&&d[p[0]]!==null&&d[p[0]][p[1]]!==undefined)return d[p[0]][p[1]];if(d[k]!==undefined)return d[k];if(d.d&&d.d[k]!==undefined)return d.d[k];return k}
 function D(k){var v=I18N[LANG].d[k];return v!==undefined?v:T(k)}
 function fmt(x){x=Math.round(x||0);var s=Math.abs(x).toString().replace(/\B(?=(\d{3})+(?!\d))/g,LANG==='fr'?' ':',');return (x<0?'−':'')+s}
 function fmtK(x){return ((x||0)<0?'−':'')+(Math.abs(x||0)/1000).toFixed(0)+' k'}
@@ -588,7 +627,7 @@ function store(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
 function load(k){try{var v=localStorage.getItem(k);return v?JSON.parse(v):null}catch(e){return null}}
 /* ---------- state ---------- */
 var H, M, CUSTOM=load(SCEN_KEY)||{};
-function setScenario(name){SCEN=name;DIRTY=false;H=CUSTOM[name]?clone(CUSTOM[name]):(name==='base'?NurEngine.defaultHypotheses():NurEngine.scenario(name));recompute();}
+function setScenario(name){SCEN=name;DIRTY=false;H=CUSTOM[name]?clone(CUSTOM[name]):(name==='base'?baseHypotheses():NurEngine.scenario(name,SHEETBASE||null));recompute();}
 function recompute(){M=NurEngine.computeModel(H);store(STORAGE_KEY,{scen:SCEN,dirty:DIRTY,h:H,lang:LANG});renderAll();}
 function markDirty(){DIRTY=true;recompute();}
 /* ---------- hypothesis paths ---------- */
@@ -656,9 +695,12 @@ function monthlyCosts(W){var v=[],f=[],i;for(i=0;i<12;i++){v.push(0);f.push(0)}f
 function renderScenarioBar(){var s='';for(var k in CUSTOM)if(CUSTOM.hasOwnProperty(k))s+='<button class="chip custom'+(SCEN===k?' active':'')+'" data-scen="'+esc(k)+'" title="'+(LANG==='fr'?'clic droit : supprimer':'right-click: delete')+'">'+esc(k)+'</button>';
   document.getElementById('customScen').innerHTML=s;
   var chips=document.querySelectorAll('.scen .chip[data-scen]');for(var i=0;i<chips.length;i++){var c=chips[i];c.classList.toggle('active',c.getAttribute('data-scen')===SCEN);c.classList.toggle('dirty',DIRTY&&c.getAttribute('data-scen')===SCEN)}
-  var note=I18N[LANG].scen[SCEN]||(H.meta&&H.meta.name)||'';document.getElementById('scenNote').textContent=(DIRTY?(LANG==='fr'?'modifié · ':'edited · '):'')+note;}
+  var bc=document.querySelector('.scen .chip[data-scen="base"]');if(bc)bc.textContent=SHEETBASE?D('sy.baseSheet'):T('s.base');
+  var K=M&&M.kpis,note=I18N[LANG].scen[SCEN]||(H.meta&&H.meta.name)||'';
+  if(K)note=K.retreats+' '+D('sy.nRet')+' × '+H.retreats.participants+' × '+fmt(H.retreats.priceTTC)+' MAD · '+K.vipDays+' '+D('sy.nVip')+' × '+fmt(Math.round(K.vipRateTTC))+' MAD';
+  document.getElementById('scenNote').textContent=(DIRTY?(LANG==='fr'?'modifié · ':'edited · '):'')+note;}
 function renderAll(){
-  var A=M.annual,K=M.kpis,W=M.weeks; renderScenarioBar();
+  var A=M.annual,K=M.kpis,W=M.weeks; renderScenarioBar(); renderSync();
   document.getElementById('kpis').innerHTML=
     kpi('accent',T('k.rev'),fmt(A.revenue)+' <small>MAD</small>',T('k.revd')+fmt(K.revenueTTC)+' MAD')+
     kpi('accent',T('k.ret'),fmt(A.revRetreat)+' <small>MAD</small>',K.retreats+' '+T('k.retd').split(' · ')[0]+' · '+K.pax+' '+T('k.retd').split(' · ')[1])+
@@ -739,8 +781,7 @@ function renderHyp(){var R=H.retreats,V=H.vip,P=H.payroll,F=H.fixed,c=H.calendar
      '<tr><td colspan="2">'+tbl([T('h.lender'),T('h.principal'),T('h.lrate'),T('h.years')],X.loans.map(function(l,j){return [esc(l.lender),inp('financing.loans.'+j+'.principal','financing_loans_principal_'+(j+1),{unit:'MAD'}),inp('financing.loans.'+j+'.rate','financing_loans_rate_'+(j+1),{type:'pct',unit:'%'}),inp('financing.loans.'+j+'.years','financing_loans_years_'+(j+1),{type:'int'})]}))+'</td></tr>'+
      hrow(T('h.legacy'),'<label class="sw"><input type="checkbox" data-path="financing.useLegacyDepreciation" data-type="bool" '+(X.useLegacyDepreciation?'checked':'')+'> '+(X.useLegacyDepreciation?'ON':'OFF')+'</label><span class="key">financing_useLegacyDepreciation</span>')+hrow(T('h.legacyAmt'),inp('financing.depreciationLegacy','financing_depreciationLegacy',{unit:'MAD'}))+
      '<tr><td colspan="2">'+tbl([T('h.asset'),T('h.base'),T('h.drate')],X.depreciation.map(function(a,j){return [esc(a.asset),inp('financing.depreciation.'+j+'.base','financing_depreciation_base_'+(j+1),{unit:'MAD'}),inp('financing.depreciation.'+j+'.rate','financing_depreciation_rate_'+(j+1),{type:'pct',unit:'%'})]}))+'</td></tr>'+hrow(T('h.cap2'),inp('financing.capitalDeployed','financing_capitalDeployed',{unit:'MAD'}))+
-     '<tr><td colspan="2" class="derived">'+T('h.derived')+' : '+D('deprAsset')+' '+fmt(Dd.depreciationAnnual)+' MAD · '+(LANG==='fr'?'annuités':'annuities')+' '+fmt(Dd.loanAnnuityMonthly)+' MAD / '+(LANG==='fr'?'mois':'month')+'</td></tr>'],
-   [T('h.integ'),hrow(T('h.endpoint'),inp('integration.endpoint','',{type:'text',cls:'w'}))+'<tr><td colspan="2" class="derived">'+(LANG==='fr'?'Sans URL, l\'application fonctionne hors ligne ; les hypothèses sont sauvegardées dans ce navigateur et échangées avec le modèle Google Sheets par CSV (bouton « Hypothèses → Sheet »). Avec une URL Apps Script (§3.5 du build-prompt), les hypothèses et les transactions réelles seront synchronisées automatiquement.':'Without a URL the app works offline; assumptions are saved in this browser and exchanged with the Google Sheets model by CSV (“Assumptions → Sheet” button). With an Apps Script URL (build-prompt §3.5), assumptions and actual bank transactions will sync automatically.')+'</td></tr>']
+     '<tr><td colspan="2" class="derived">'+T('h.derived')+' : '+D('deprAsset')+' '+fmt(Dd.depreciationAnnual)+' MAD · '+(LANG==='fr'?'annuités':'annuities')+' '+fmt(Dd.loanAnnuityMonthly)+' MAD / '+(LANG==='fr'?'mois':'month')+'</td></tr>']
   ];
   document.getElementById('hypGrid').innerHTML=cards.map(function(c){return '<div class="card hyp"><h3>'+c[0]+'</h3><table>'+c[1]+'</table></div>'}).join('');
 }
@@ -871,7 +912,7 @@ document.querySelector('.scen').addEventListener('click',function(e){if(e.target
 document.querySelector('.scen').addEventListener('contextmenu',function(e){var b=e.target.closest('.chip.custom');if(!b)return;e.preventDefault();var k=b.getAttribute('data-scen');if(confirm(T('s.del')+' — '+k)){delete CUSTOM[k];store(SCEN_KEY,CUSTOM);if(SCEN===k)setScenario('base');else renderScenarioBar();}});
 document.getElementById('hypGrid').addEventListener('change',function(e){var el=e.target;if(!el.getAttribute)return;var p=el.getAttribute('data-path');if(!p)return;var type=el.getAttribute('data-type'),v;
   if(type==='bool')v=!!el.checked;else if(type==='date'||type==='text')v=el.value;else{v=parseFloat(String(el.value).replace(',','.'));if(isNaN(v))return;if(type==='pct')v=v/100;if(type==='int')v=Math.round(v);}
-  setPath(H,p,v);if(p==='integration.endpoint'){ENDPOINT=v;store(STORAGE_KEY,{scen:SCEN,dirty:DIRTY,h:H,lang:LANG});return}markDirty();});
+  setPath(H,p,v);if(p==='integration.endpoint'){ENDPOINT=String(v||'').trim();store(STORAGE_KEY,{scen:SCEN,dirty:DIRTY,h:H,lang:LANG});if(ENDPOINT)pullSheet(false);else{SYNC.state='local';renderSync()}return}markDirty();});
 document.getElementById('tab-cost').addEventListener('click',function(e){var t=e.target.closest('[data-tile]');if(t){var f=t.getAttribute('data-tile');COSTFAM=(COSTFAM===f||t.classList.contains('close'))?'all':f;renderCost(M.annual,M.kpis);return}
   var f2=e.target.closest('[data-fam]');if(f2){COSTFAM=f2.getAttribute('data-fam');renderCost(M.annual,M.kpis);return}
   var tg=e.target.closest('[data-tag]');if(tg){var k=tg.getAttribute('data-tag');COSTTAG[k]=!COSTTAG[k];renderCost(M.annual,M.kpis);return}
@@ -891,17 +932,225 @@ document.getElementById('btnExportCsvHyp').addEventListener('click',exportCsvHyp
 document.getElementById('btnExportLedger').addEventListener('click',exportLedger);
 document.getElementById('btnImport').addEventListener('click',function(){document.getElementById('fileImport').click()});
 document.getElementById('fileImport').addEventListener('change',function(e){if(e.target.files&&e.target.files[0])importFile(e.target.files[0]);e.target.value='';});
+document.getElementById('btnSync').addEventListener('click',function(){pullSheet(false)});
+document.getElementById('btnPublish').addEventListener('click',publishToSheet);
+document.getElementById('btnPrint').addEventListener('click',function(){window.print()});
+document.getElementById('epInput').addEventListener('change',function(){setEndpoint(this.value)});
+document.getElementById('epInput').addEventListener('keydown',function(e){if(e.key==='Enter')setEndpoint(this.value)});
+document.getElementById('syncStrip').addEventListener('click',function(e){var b=e.target.closest('button[data-adopt]');if(b){adoptActual(b.getAttribute('data-adopt'));return}
+  if(e.target.closest('button[data-pub]'))publishToSheet();});
+setInterval(function(){if(ENDPOINT&&!SYNC.pending&&!document.hidden)pullSheet(true)},300000);
+document.addEventListener('visibilitychange',function(){if(!document.hidden&&ENDPOINT&&!SYNC.pending)pullSheet(true)});
 document.getElementById('btnReset').addEventListener('click',function(){if(confirm(LANG==='fr'?'Revenir aux hypothèses du scénario de base ?':'Reset to the base scenario?'))setScenario('base')});
 /* ---------- optional endpoint (phase 2) ---------- */
-function syncEndpoint(){var badge=document.getElementById('modeBadge');if(!ENDPOINT){badge.className='mock';badge.textContent=T('mode.local');return}
-  badge.textContent=T('mode.stale');badge.className='mock stale';
-  try{var xhr=new XMLHttpRequest();xhr.open('GET',ENDPOINT+(ENDPOINT.indexOf('?')>0?'&':'?')+'model=nur',true);xhr.onreadystatechange=function(){if(xhr.readyState!==4)return;if(xhr.status===200){try{var o=JSON.parse(xhr.responseText);if(o&&o.hypotheses&&o.hypotheses.calendar){H=o.hypotheses;DIRTY=false;recompute();badge.className='mock live';badge.textContent=T('mode.live');}}catch(e){}}};xhr.send();}catch(e){}}
+/* ======================================================================
+   SHEET SYNC v1.2 — the Google Sheet holds the official "Base" hypotheses
+   and the actuals; this app is a sandbox on top of it.
+   ====================================================================== */
+var SHEET = null;        /* last payload read from the Sheet */
+var SHEETBASE = null;    /* hypotheses object rebuilt from the Sheet pairs */
+var SHEETM = null;       /* model computed from SHEETBASE (reconciliation) */
+var ACTUALS = null;      /* capital / financing / operating actuals */
+var SYNC = { state: 'local', at: '', err: '', pending: false };
+var SHEET_KEY = 'nur.sheet.v1', ACT_KEY = 'nur.actuals.v1';
+
+function baseHypotheses(){ return SHEETBASE ? clone(SHEETBASE) : NurEngine.defaultHypotheses(); }
+function hypFromPairs(pairs){
+  var h = NurEngine.defaultHypotheses(); applyFlat(h, pairs);
+  h.meta = h.meta || {}; h.meta.name = 'Base — Sheet'; h.meta.source = 'sheet';
+  if (ENDPOINT) { h.integration = h.integration || {}; h.integration.endpoint = ENDPOINT; }
+  return h;
+}
+
+/* ---------- transport (ES5, no dependency) ---------- */
+function sheetUrl(a){ return ENDPOINT + (ENDPOINT.indexOf('?') > 0 ? '&' : '?') + 'action=' + a + '&nocache=1&t=' + (new Date()).getTime(); }
+function httpGet(url, cb){
+  try {
+    var x = new XMLHttpRequest(); x.open('GET', url, true); x.timeout = 25000;
+    x.onreadystatechange = function(){ if (x.readyState !== 4) return;
+      if (x.status >= 200 && x.status < 400) { try { cb(null, JSON.parse(x.responseText)); } catch(e){ cb('parse'); } }
+      else cb('http ' + x.status); };
+    x.ontimeout = function(){ cb('timeout'); }; x.onerror = function(){ cb('network'); };
+    x.send();
+  } catch(e){ cb(String(e.message || e)); }
+}
+function httpPost(url, body, cb){
+  try {
+    var x = new XMLHttpRequest(); x.open('POST', url, true); x.timeout = 30000;
+    x.setRequestHeader('Content-Type', 'text/plain;charset=utf-8'); /* keeps it a simple request: no CORS preflight */
+    x.onreadystatechange = function(){ if (x.readyState !== 4) return;
+      if (x.status >= 200 && x.status < 400) { try { cb(null, JSON.parse(x.responseText)); } catch(e){ cb('parse'); } }
+      else cb('http ' + x.status); };
+    x.ontimeout = function(){ cb('timeout'); }; x.onerror = function(){ cb('network'); };
+    x.send(JSON.stringify(body));
+  } catch(e){ cb(String(e.message || e)); }
+}
+/* SHA-256 (compact, ES5) — the password never leaves the browser in clear text. */
+function sha256(str){
+  var ascii = unescape(encodeURIComponent(String(str)));
+  function rrot(v, a){ return (v >>> a) | (v << (32 - a)); }
+  var mp = Math.pow, maxWord = mp(2, 32), i, j, result = '';
+  var words = [], bitLength = ascii.length * 8;
+  var hash = sha256.h = sha256.h || [], k = sha256.k = sha256.k || [], pc = k.length, composite = {};
+  for (var cand = 2; pc < 64; cand++) {
+    if (!composite[cand]) {
+      for (i = 0; i < 313; i += cand) composite[i] = cand;
+      hash[pc] = (mp(cand, 0.5) * maxWord) | 0;
+      k[pc++] = (mp(cand, 1 / 3) * maxWord) | 0;
+    }
+  }
+  ascii += '\x80';
+  while (ascii.length % 64 - 56) ascii += '\x00';
+  for (i = 0; i < ascii.length; i++) { j = ascii.charCodeAt(i); if (j >> 8) return ''; words[i >> 2] |= j << ((3 - i) % 4) * 8; }
+  words[words.length] = ((bitLength / maxWord) | 0); words[words.length] = bitLength;
+  for (j = 0; j < words.length;) {
+    var w = words.slice(j, j += 16), oldHash = hash; hash = hash.slice(0, 8);
+    for (i = 0; i < 64; i++) {
+      var w15 = w[i - 15], w2 = w[i - 2], a = hash[0], e = hash[4];
+      var t1 = hash[7] + (rrot(e, 6) ^ rrot(e, 11) ^ rrot(e, 25)) + ((e & hash[5]) ^ ((~e) & hash[6])) + k[i]
+             + (w[i] = (i < 16) ? w[i] : (w[i - 16] + (rrot(w15, 7) ^ rrot(w15, 18) ^ (w15 >>> 3)) + w[i - 7] + (rrot(w2, 17) ^ rrot(w2, 19) ^ (w2 >>> 10))) | 0);
+      var t2 = (rrot(a, 2) ^ rrot(a, 13) ^ rrot(a, 22)) + ((a & hash[1]) ^ (a & hash[2]) ^ (hash[1] & hash[2]));
+      hash = [(t1 + t2) | 0].concat(hash); hash[4] = (hash[4] + t1) | 0;
+    }
+    for (i = 0; i < 8; i++) hash[i] = (hash[i] + oldHash[i]) | 0;
+  }
+  for (i = 0; i < 8; i++) for (j = 3; j + 1; j--) { var b = (hash[i] >> (j * 8)) & 255; result += ((b < 16) ? 0 : '') + b.toString(16); }
+  return result;
+}
+
+/* ---------- pull / publish ---------- */
+function setEndpoint(v){
+  ENDPOINT=String(v||'').trim();
+  H.integration=H.integration||{};H.integration.endpoint=ENDPOINT;
+  if(SHEETBASE){SHEETBASE.integration=SHEETBASE.integration||{};SHEETBASE.integration.endpoint=ENDPOINT}
+  store(STORAGE_KEY,{scen:SCEN,dirty:DIRTY,h:H,lang:LANG});
+  if(ENDPOINT)pullSheet(false);else{SYNC.state='local';SYNC.err='';renderSync()}
+}
+function syncBoot(){
+  var c = load(SHEET_KEY); if (c && c.pairs && c.pairs.length) { SHEET = c; SHEETBASE = hypFromPairs(c.pairs); SHEETM = NurEngine.computeModel(SHEETBASE); SYNC.state = 'cache'; SYNC.at = c.fetchedAt || ''; }
+  var a = load(ACT_KEY); if (a) ACTUALS = a;
+  if (!ENDPOINT) { SYNC.state = 'local'; renderSync(); return; }
+  pullSheet(true);
+}
+function pullSheet(silent){
+  if (!ENDPOINT) { if (!silent) alert(D('sy.noEndpoint')); return; }
+  SYNC.pending = true; renderSync();
+  httpGet(sheetUrl('all'), function(err, o){
+    SYNC.pending = false;
+    var hp = o && o.hypotheses;
+    if (err || !hp || !hp.pairs || !hp.pairs.length) {
+      SYNC.state = SHEET ? 'cache' : 'error'; SYNC.err = err || ((o && o.error) || 'payload');
+      renderSync(); if (!silent) alert(D('sy.pullFailed') + ' ' + SYNC.err); return;
+    }
+    SHEET = { version: hp.version, updatedAt: hp.updatedAt, label: hp.label, by: hp.by, sheet: hp.sheet,
+              pairs: hp.pairs, labels: hp.labels, derived: hp.derived, missing: hp.missing || [],
+              kpis: hp.kpis || {}, checks: hp.checks || {}, fetchedAt: new Date().toISOString() };
+    ACTUALS = o.actuals || ACTUALS;
+    SHEETBASE = hypFromPairs(hp.pairs);
+    try { SHEETM = NurEngine.computeModel(SHEETBASE); } catch(e){ SHEETM = null; }
+    store(SHEET_KEY, SHEET); if (ACTUALS) store(ACT_KEY, ACTUALS);
+    SYNC.state = 'live'; SYNC.at = SHEET.fetchedAt; SYNC.err = '';
+    if (SCEN === 'base' && !DIRTY) { H = clone(SHEETBASE); recompute(); }
+    else renderSync();
+  });
+}
+function publishToSheet(){
+  if (!ENDPOINT) { alert(D('sy.noEndpoint')); return; }
+  var label = prompt(D('sy.label'), (H.meta && H.meta.name) || D('sy.defLabel')); if (label === null) return;
+  var pw = prompt(D('sy.pw')); if (!pw) return;
+  SYNC.pending = true; renderSync();
+  httpPost(ENDPOINT, { action: 'publishHypotheses', pwHash: sha256(pw), pairs: flatten(H), label: label, author: 'app' }, function(err, o){
+    SYNC.pending = false;
+    if (err || !o || !o.ok) { alert(D('sy.pubFailed') + ' ' + (err || (o && o.error) || '')); renderSync(); return; }
+    SHEETBASE = clone(H); try { SHEETM = NurEngine.computeModel(SHEETBASE); } catch(e){}
+    SHEET = SHEET || {}; SHEET.version = o.version; SHEET.updatedAt = o.updatedAt; SHEET.label = label;
+    SHEET.kpis = o.kpis || SHEET.kpis; SHEET.checks = o.checks || SHEET.checks;
+    SHEET.pairs = flatten(H); SHEET.fetchedAt = new Date().toISOString();
+    store(SHEET_KEY, SHEET);
+    SCEN = 'base'; DIRTY = false; SYNC.state = 'live'; SYNC.at = SHEET.fetchedAt;
+    alert(D('sy.published') + ' v' + o.version + ' — ' + o.written + ' ' + D('sy.values') +
+          (o.rejected && o.rejected.length ? '\n' + D('sy.rejected') + ' ' + o.rejected.join(', ') : ''));
+    recompute();
+  });
+}
+function adoptActual(which){
+  if (!ACTUALS) return;
+  var X = H.financing;
+  if (which === 'capital' && ACTUALS.capital) X.capitalDeployed = Math.round(ACTUALS.capital.deployed);
+  if (which === 'cca' && ACTUALS.financing) X.ccaBalance = Math.round(ACTUALS.financing.cca);
+  markDirty();
+}
+
+/* ---------- reconciliation app ↔ Sheet ---------- */
+function sheetDiffs(){
+  if (!SHEET || !SHEETM || !SHEET.kpis) return null;
+  var pairs = [['pl_revenue', SHEETM.annual.revenue], ['pl_ebitda', SHEETM.annual.ebitda],
+               ['k_closingCash', SHEETM.kpis.closingCash], ['k_minCash', SHEETM.kpis.minCash],
+               ['pl_net', SHEETM.annual.net]];
+  var bad = [];
+  for (var i = 0; i < pairs.length; i++) {
+    var k = pairs[i][0], app = pairs[i][1], sh = SHEET.kpis[k];
+    if (typeof sh !== 'number') continue;
+    if (Math.abs(sh - app) > 1) bad.push({ k: k, app: app, sheet: sh });
+  }
+  return bad;
+}
+
+/* ---------- rendering ---------- */
+function syncBadge(){
+  var b = document.getElementById('modeBadge'); if (!b) return;
+  var cls = 'mock', txt;
+  if (SYNC.pending) { txt = D('sy.syncing'); cls = 'mock'; }
+  else if (SYNC.state === 'live' && DIRTY) { txt = D('sy.sandbox'); cls = 'mock stale'; }
+  else if (SYNC.state === 'live') { txt = D('sy.sheet') + ' v' + (SHEET && SHEET.version || '1'); cls = 'mock live'; }
+  else if (SYNC.state === 'cache') { txt = D('sy.cache'); cls = 'mock stale'; }
+  else if (SYNC.state === 'error') { txt = D('sy.offline'); cls = 'mock stale'; }
+  else txt = T('mode.local');
+  b.className = cls; b.textContent = 'v1.2 · ' + txt;
+}
+function srcPanel(){
+  var dot=document.getElementById('srcDot'),txt=document.getElementById('srcTxt'),ep=document.getElementById('epInput'),nt=document.getElementById('srcNote');
+  if(!dot)return;
+  if(ep&&document.activeElement!==ep&&ep.value!==ENDPOINT)ep.value=ENDPOINT;
+  var cls='local',t=D('src.local');
+  if(SYNC.pending){cls='syncing';t=D('src.syncing')}
+  else if(SYNC.state==='live'){cls='';t=D('src.live')+' '+new Date(SYNC.at||Date.now()).toLocaleTimeString()}
+  else if(SYNC.state==='cache'){cls='stale';t=D('src.cache')+' '+(SYNC.at?new Date(SYNC.at).toLocaleString():'')}
+  else if(SYNC.state==='error'){cls='err';t=D('src.down')}
+  dot.className='dot'+(cls?' '+cls:'');txt.textContent=t;
+  var pb=document.getElementById('btnPublish');if(pb){pb.disabled=!ENDPOINT||!DIRTY;pb.classList.toggle('primary',!!(ENDPOINT&&DIRTY))}
+  var sb=document.getElementById('btnSync');if(sb){sb.disabled=!ENDPOINT||SYNC.pending}
+  if(nt)nt.textContent=SHEET&&SYNC.state!=='local'?(SHEET.sheet||'')+' · v'+SHEET.version+' · '+(SHEET.label||'')+(SHEET.by?' · '+SHEET.by:''):D('src.note');
+}
+function renderSync(){
+  syncBadge(); srcPanel();
+  var el = document.getElementById('syncStrip'); if (!el) return;
+  if (!ENDPOINT) { el.innerHTML = '<div class="c">' + D('sy.localMode') + '</div>'; return; }
+  var s = '', dif = sheetDiffs();
+  var src = SYNC.state === 'live' ? D('sy.srcLive') : SYNC.state === 'cache' ? D('sy.srcCache') : D('sy.srcErr');
+  s += '<div class="c">' + src + (SHEET ? ' <b>v' + SHEET.version + '</b> · ' + (SHEET.label || '') + (SHEET.updatedAt ? ' · ' + SHEET.updatedAt.slice(0, 16).replace('T', ' ') : '') : '') + '</div>';
+  if (SYNC.pending) s += '<div class="c">' + D('sy.syncing') + '</div>';
+  if (SYNC.err) s += '<div class="c warn">' + D('sy.err') + ' ' + esc(SYNC.err) + '</div>';
+  if (DIRTY && SHEETM) { var dE = M.annual.ebitda - SHEETM.annual.ebitda, dC = M.kpis.closingCash - SHEETM.kpis.closingCash;
+    s += '<div class="c warn">' + D('sy.dirty') + ' — EBITDA <b>' + (dE >= 0 ? '+' : '−') + fmt(Math.abs(dE)) + '</b> · ' + D('sy.cashEnd') + ' <b>' + (dC >= 0 ? '+' : '−') + fmt(Math.abs(dC)) + '</b> ' + D('sy.vsSheet') + (ENDPOINT ? ' <button class="lnk" data-pub="1">' + D('src.pubNow') + '</button>' : '') + '</div>'; }
+  else if (DIRTY) s += '<div class="c warn">' + D('sy.dirty') + '</div>';
+  if (SHEET && SHEET.missing && SHEET.missing.length) s += '<div class="c warn">' + D('sy.missing') + ' ' + SHEET.missing.length + '</div>';
+  if (dif) s += '<div class="c' + (dif.length ? ' warn' : '') + '">' + (dif.length ? '⚠ ' + D('sy.diff') + ' ' + dif.map(function(d){ return d.k + ' ' + fmt(d.sheet) + ' ≠ ' + fmt(d.app); }).join(' · ') : '✓ ' + D('sy.match')) + '</div>';
+  if (ACTUALS && ACTUALS.capital) {
+    s += '<div class="c">' + D('sy.capital') + ' <b>' + fmt(ACTUALS.capital.deployed) + ' MAD</b>' + (ACTUALS.meta && ACTUALS.meta.asOf ? ' · ' + ACTUALS.meta.asOf : '') +
+         ' <button class="lnk" data-adopt="capital">' + D('sy.adopt') + '</button></div>';
+    if (ACTUALS.financing) s += '<div class="c">CCA <b>' + fmt(ACTUALS.financing.cca) + '</b> · ' + D('loans') + ' <b>' + fmt(ACTUALS.financing.loans) + '</b>' +
+         ' <button class="lnk" data-adopt="cca">' + D('sy.adopt') + '</button></div>';
+  }
+  el.innerHTML = s;
+}
+
 /* ---------- boot ---------- */
 (function(){var saved=load(STORAGE_KEY);if(saved&&saved.h&&saved.h.calendar&&saved.h.meta&&saved.h.meta.version==='1.1'){H=saved.h;SCEN=saved.scen||'base';DIRTY=!!saved.dirty;if(saved.lang)LANG=saved.lang;if(!CUSTOM[SCEN]&&['base','ramp','stress','playbook'].indexOf(SCEN)<0)SCEN='custom';}else{H=NurEngine.defaultHypotheses();}
   ENDPOINT=(H.integration&&H.integration.endpoint)||'';
   if(LANG==='en'){document.getElementById('langFR').classList.remove('active');document.getElementById('langEN').classList.add('active');var els=document.querySelectorAll('[data-i18n]');for(var i=0;i<els.length;i++)els[i].textContent=T(els[i].getAttribute('data-i18n'));}
   var ui=load(UI_KEY);if(ui&&ui.tab){var b=document.querySelector('nav button[data-tab="'+ui.tab+'"]');if(b)b.click();}
-  recompute();syncEndpoint();})();
+  syncBoot();recompute();})();
 
 </script>
 </body>
