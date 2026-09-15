@@ -365,7 +365,7 @@ button.lnk{border:none;background:none;color:var(--terra);cursor:pointer;font:60
         ],
         capitalDeployed: 10000001
       },
-      integration: { endpoint: 'https://script.google.com/macros/s/AKfycbzOVy1v0DupVODtQ7DCZiODW7NmT5Jug7SRsPUIs2HX5PwJsyb8n9tD5WEaPjrN6zgi/exec', pollMinutes: 5, hypothesesTab: 'Hypotheses', actualsFeed: true }
+      integration: { endpoint: 'https://script.google.com/macros/s/AKfycbxv2d2xp_GZ5WOck2tnD6MDuQZp_KL4GaLM0tZ1MnFtLTgyB1NI0bQ5t1suXKmvTzHg/exec', pollMinutes: 5, hypothesesTab: 'Hypotheses', actualsFeed: true }
     };
   }
 
@@ -583,7 +583,7 @@ button.lnk{border:none;background:none;color:var(--terra);cursor:pointer;font:60
 </script>
 <script>
 /* ===================== Nûr Retreats — app UI v1.1 (ES5) ===================== */
-var DEFAULT_ENDPOINT = 'https://script.google.com/macros/s/AKfycbzOVy1v0DupVODtQ7DCZiODW7NmT5Jug7SRsPUIs2HX5PwJsyb8n9tD5WEaPjrN6zgi/exec'; // Nur Retreats BM API, deployed 15 Sep 2026
+var DEFAULT_ENDPOINT = 'https://script.google.com/macros/s/AKfycbxv2d2xp_GZ5WOck2tnD6MDuQZp_KL4GaLM0tZ1MnFtLTgyB1NI0bQ5t1suXKmvTzHg/exec'; // Nur Retreats BM API, deployed 15 Sep 2026
 var ENDPOINT = DEFAULT_ENDPOINT;  // Apps Script web app; empty it in the Hypotheses tab to work offline
 var STORAGE_KEY = 'nur.hypotheses.v1', SCEN_KEY = 'nur.scenarios.v1', UI_KEY = 'nur.ui.v1';
 var I18N = {
@@ -952,7 +952,7 @@ var SHEET = null;        /* last payload read from the Sheet */
 var SHEETBASE = null;    /* hypotheses object rebuilt from the Sheet pairs */
 var SHEETM = null;       /* model computed from SHEETBASE (reconciliation) */
 var ACTUALS = null;      /* capital / financing / operating actuals */
-var SYNC = { state: 'local', at: '', err: '', pending: false };
+var SYNC = { state: 'local', at: '', err: '', pending: false, gen: 0 };
 var SHEET_KEY = 'nur.sheet.v1', ACT_KEY = 'nur.actuals.v1';
 
 function baseHypotheses(){ return SHEETBASE ? clone(SHEETBASE) : NurEngine.defaultHypotheses(); }
@@ -965,13 +965,19 @@ function hypFromPairs(pairs){
 
 /* ---------- transport (ES5, no dependency) ---------- */
 function sheetUrl(a){ return ENDPOINT + (ENDPOINT.indexOf('?') > 0 ? '&' : '?') + 'action=' + a + '&nocache=1&t=' + (new Date()).getTime(); }
-function httpGet(url, cb){
+function httpGet(url, cb, tries){
+  tries = tries || 0;
+  function again(err){
+    /* Google occasionally answers a web app with an HTML interstitial; one retry clears it */
+    if (tries < 1 && (err === 'parse' || err === 'network')) setTimeout(function(){ httpGet(url, cb, tries + 1); }, 2500);
+    else cb(err);
+  }
   try {
     var x = new XMLHttpRequest(); x.open('GET', url, true); x.timeout = 90000;
     x.onreadystatechange = function(){ if (x.readyState !== 4) return;
-      if (x.status >= 200 && x.status < 400) { try { cb(null, JSON.parse(x.responseText)); } catch(e){ cb('parse'); } }
-      else cb('http ' + x.status); };
-    x.ontimeout = function(){ cb('timeout'); }; x.onerror = function(){ cb('network'); };
+      if (x.status >= 200 && x.status < 400) { try { cb(null, JSON.parse(x.responseText)); } catch(e){ again('parse'); } }
+      else again('http ' + x.status); };
+    x.ontimeout = function(){ cb('timeout'); }; x.onerror = function(){ again('network'); };
     x.send();
   } catch(e){ cb(String(e.message || e)); }
 }
@@ -1035,8 +1041,10 @@ function syncBoot(){
 }
 function pullSheet(silent){
   if (!ENDPOINT) { if (!silent) alert(D('sy.noEndpoint')); return; }
+  var gen = ++SYNC.gen, ep = ENDPOINT;
   SYNC.pending = true; renderSync();
   httpGet(sheetUrl('hypotheses'), function(err, o){
+    if (gen !== SYNC.gen || ep !== ENDPOINT) return;   /* a newer pull has superseded this one */
     SYNC.pending = false;
     var hp = o && o.pairs ? o : (o && o.hypotheses);
     if (err || !hp || !hp.pairs || !hp.pairs.length) {
@@ -1058,7 +1066,9 @@ function pullSheet(silent){
 }
 function pullActuals(){
   if (!ENDPOINT) return;
+  var gen = SYNC.gen, ep = ENDPOINT;
   httpGet(sheetUrl('actuals'), function(err, a){
+    if (gen !== SYNC.gen || ep !== ENDPOINT) return;
     if (err || !a || a.ok === false || !a.capital) return;
     ACTUALS = a; store(ACT_KEY, a); renderSync();
   });
@@ -1068,7 +1078,8 @@ function publishToSheet(){
   var label = prompt(D('sy.label'), (H.meta && H.meta.name) || D('sy.defLabel')); if (label === null) return;
   var pw = prompt(D('sy.pw')); if (!pw) return;
   SYNC.pending = true; renderSync();
-  httpPost(ENDPOINT, { action: 'publishHypotheses', pwHash: sha256(pw), pairs: flatten(H), label: label, author: 'app' }, function(err, o){
+  var pairs = flatten(H).filter(function(p){ return p[0] !== 'calendar_startDate'; });   /* structural: set it in the Sheet */
+  httpPost(ENDPOINT, { action: 'publishHypotheses', pwHash: sha256(pw), pairs: pairs, label: label, author: 'app' }, function(err, o){
     SYNC.pending = false;
     if (err || !o || !o.ok) { alert(D('sy.pubFailed') + ' ' + (err || (o && o.error) || '')); renderSync(); return; }
     SHEETBASE = clone(H); try { SHEETM = NurEngine.computeModel(SHEETBASE); } catch(e){}
